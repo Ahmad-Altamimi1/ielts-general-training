@@ -1,63 +1,133 @@
-import type { Exercise } from "@/lib/content/schema";
+"use client";
 
-/**
- * Renders an exercise.
- *
- * Milestone 2 prints the rubric and the numbered questions, which is what
- * the book does. Milestone 4 adds the inputs, the marking and the timer to
- * this same card.
- */
+import { useState } from "react";
+
+import { ExerciseTimer } from "@/components/exercise/exercise-timer";
+import { QuestionFeedback } from "@/components/exercise/question-feedback";
+import { QuestionInput } from "@/components/exercise/question-input";
+import { Button } from "@/components/ui/button";
+import type { Exercise } from "@/lib/content/schema";
+import { markExercise, type ExerciseResult } from "@/lib/marking";
+
 export function ExerciseCard({ exercise }: { exercise: Exercise }) {
+  const [responses, setResponses] = useState<Record<number, string>>({});
+  const [result, setResult] = useState<ExerciseResult | null>(null);
+
+  const answer = (n: number, value: string) => {
+    setResponses((current) => ({ ...current, [n]: value }));
+  };
+
+  const check = () => setResult(markExercise(exercise, responses));
+
+  const reset = () => {
+    setResponses({});
+    setResult(null);
+  };
+
+  const answered = exercise.questions.filter(
+    (q) => (responses[q.n] ?? "").trim() !== "",
+  ).length;
+
+  const byNumber = new Map(result?.results.map((r) => [r.n, r]) ?? []);
+
   return (
     <section
       aria-labelledby={`${exercise.id}-title`}
-      className="break-inside-avoid mt-8 border-t-2 border-rule-strong pt-5"
+      className="mt-10 border-t-2 border-rule-strong pt-5"
     >
-      <h4
-        id={`${exercise.id}-title`}
-        className="font-heading text-base font-semibold tracking-tight"
-      >
-        {exercise.title}
-      </h4>
+      <div className="measure">
+        <h4
+          id={`${exercise.id}-title`}
+          className="font-heading text-base font-semibold tracking-tight"
+        >
+          {exercise.title}
+        </h4>
 
-      <p className="passage-type measure mt-2">{exercise.instruction}</p>
+        <p className="passage-type mt-2">{exercise.instruction}</p>
 
-      {exercise.options ? (
-        <ol className="measure mt-4 space-y-1.5 text-[0.9375rem]">
-          {exercise.options.map((option, i) => (
-            <li key={i}>{option}</li>
-          ))}
-        </ol>
-      ) : null}
+        {exercise.timeLimitSeconds ? (
+          <div className="mt-4">
+            <ExerciseTimer
+              limitSeconds={exercise.timeLimitSeconds}
+              exerciseTitle={exercise.title}
+            />
+          </div>
+        ) : null}
 
-      <ol className="measure mt-5 space-y-4">
-        {exercise.questions.map((question) => (
-          <li
-            key={question.n}
-            className="grid grid-cols-[2.25rem_1fr] gap-x-1 break-inside-avoid"
-          >
-            <span className="font-heading pt-px text-sm font-semibold text-brand tabular-nums">
-              {question.n}.
-            </span>
-            <div>
-              <p>{question.prompt}</p>
-              {question.choices ? (
-                <ul className="mt-2 space-y-1 text-[0.9375rem]">
-                  {question.choices.map((choice) => (
-                    <li
-                      key={choice.id}
-                      className="grid grid-cols-[1.5rem_1fr] gap-x-1"
-                    >
-                      <span className="text-ink-muted">{choice.id}</span>
-                      <span>{choice.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          </li>
-        ))}
+        {exercise.options && exercise.kind !== "headings" ? (
+          <ul className="mt-4 space-y-1 text-[0.9375rem]">
+            {exercise.options.map((option) => (
+              <li key={option}>{option}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+
+      <ol className="measure mt-6 space-y-7">
+        {exercise.questions.map((question) => {
+          const questionResult = byNumber.get(question.n);
+          return (
+            <li
+              key={question.n}
+              className="grid grid-cols-[2.25rem_1fr] gap-x-1 break-inside-avoid"
+            >
+              <span
+                aria-hidden="true"
+                className="font-heading pt-px text-sm font-semibold text-brand tabular-nums"
+              >
+                {question.n}.
+              </span>
+
+              <div className="min-w-0">
+                <p>{question.prompt}</p>
+
+                <QuestionInput
+                  exercise={exercise}
+                  question={question}
+                  value={responses[question.n] ?? ""}
+                  onChange={(value) => answer(question.n, value)}
+                  disabled={result !== null}
+                />
+
+                {questionResult ? (
+                  <QuestionFeedback result={questionResult} />
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
       </ol>
+
+      <div className="measure print-hidden mt-8 flex flex-wrap items-center gap-3 border-t border-rule pt-4">
+        {result === null ? (
+          <>
+            <Button type="button" onClick={check}>
+              Check {exercise.questions.length} answers
+            </Button>
+            <p className="text-sm text-ink-muted">
+              {answered} of {exercise.questions.length} answered
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-heading text-lg font-semibold">
+              <span className="text-brand tabular-nums">{result.score}</span>
+              <span className="text-ink-muted"> / {result.total}</span>
+            </p>
+            <Button type="button" variant="outline" onClick={reset}>
+              Reset
+            </Button>
+          </>
+        )}
+      </div>
+
+      {/* The score reaches a screen reader as soon as marking happens,
+          without moving focus away from where the student was. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {result
+          ? `${exercise.title} marked. ${result.score} out of ${result.total} correct. Every answer now shows its explanation.`
+          : ""}
+      </p>
     </section>
   );
 }

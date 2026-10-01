@@ -18,7 +18,19 @@
  */
 
 import type { DocNode, Para, Run, Table } from "./read-docx";
-import type { Block, Paragraph, Part, Section } from "../../lib/content/schema";
+import {
+  buildExercise,
+  collectAnswerKeys,
+  questionNumber,
+  type KeyIndex,
+} from "./exercises";
+import type {
+  Block,
+  BlockOf,
+  Paragraph,
+  Part,
+  Section,
+} from "../../lib/content/schema";
 
 /** A part before validation: `summary` comes from the printed Contents
  *  page and the book does not give one for every part. */
@@ -238,7 +250,23 @@ function slug(text: string): string {
 type Accumulator = {
   blocks: Block[];
   list: { ordered: boolean; items: string[] } | null;
+  /** Numbered question paragraphs seen since the last other node. */
+  questions: Para[];
+  /** Third-level headings seen in this section, newest last. */
+  headings: string[];
+  /** How many exercises this section has already produced. */
+  exerciseCount: number;
 };
+
+function emptyAccumulator(): Accumulator {
+  return {
+    blocks: [],
+    list: null,
+    questions: [],
+    headings: [],
+    exerciseCount: 0,
+  };
+}
 
 function flushList(acc: Accumulator): void {
   if (acc.list && acc.list.items.length > 0) {
@@ -271,16 +299,99 @@ function readContents(nodes: DocNode[]): Map<string, string> {
   return summaries;
 }
 
+/** The exercise's name. The book heads the questions themselves "Now do
+ *  these", but names the task "Practice 4" a little earlier; the latter is
+ *  what a student looking at a list of exercises needs to see. */
+function exerciseTitle(
+  headings: string[],
+  instruction: string,
+  fallback: string,
+): string {
+  const practice = [...headings].reverse().find((h) => /^Practice\b/i.test(h));
+  if (practice) return practice;
+
+  // Where the book does not name the task it labels it in the rubric —
+  // "Questions 30 to 34. …" — and that label is what the student sees on
+  // the page, so it is what the exercise is called.
+  const range = /^Questions?\s+\d+\s+(?:to|through|[-–])\s+\d+/i.exec(
+    instruction,
+  );
+  if (range) return range[0];
+
+  return headings.at(-1) ?? fallback;
+}
+
 export function docxToParts(nodes: DocNode[]): ConvertResult {
   const warnings: string[] = [];
   const summaries = readContents(nodes);
+  const keyIndex: KeyIndex = collectAnswerKeys(nodes);
 
   const parts: DraftPart[] = [];
   let part: DraftPart | null = null;
   let section: Section | null = null;
-  let acc: Accumulator = { blocks: [], list: null };
+  let acc: Accumulator = emptyAccumulator();
+
+  /**
+   * Turns a run of numbered question paragraphs into an exercise block.
+   *
+   * The rubric immediately precedes the questions in the book, so it is
+   * taken from the prose block just pushed and removed from the flow —
+   * the exercise shows it verbatim, and printing it twice would be wrong.
+   */
+  const flushQuestions = () => {
+    if (acc.questions.length === 0) return;
+    const questionParas = acc.questions;
+    acc.questions = [];
+
+    if (!section) return;
+
+    const previous = acc.blocks.at(-1);
+    let instruction = "";
+    if (previous?.kind === "prose") {
+      acc.blocks.pop();
+      instruction = previous.md.replace(/[*\\]/g, "");
+    }
+
+
+
+    const title = exerciseTitle(acc.headings, instruction, section.title);
+
+    if (instruction === "") {
+      warnings.push(
+        `${section.id}: a run of ${questionParas.length} numbered questions has no rubric before it, so it cannot be marked. Left as prose.`,
+      );
+      for (const para of questionParas) {
+        acc.blocks.push({ kind: "prose", md: runsToMarkdown(para.runs) });
+      }
+      return;
+    }
+
+    const result = buildExercise({
+      sectionId: section.id,
+      ordinal: acc.exerciseCount,
+      title,
+      instruction,
+      questionParas,
+      keys: keyIndex.get(section.id),
+    });
+
+    if (!result.ok) {
+      warnings.push(result.warning);
+      acc.exerciseCount += 1;
+      acc.blocks.push({ kind: "prose", md: instruction });
+      for (const para of questionParas) {
+        acc.blocks.push({ kind: "prose", md: runsToMarkdown(para.runs) });
+      }
+      return;
+    }
+
+    warnings.push(...result.warnings);
+    acc.blocks.push({ kind: "exercise", exercise: result.exercise });
+    acc.exerciseCount += 1;
+  };
 
   const closeSection = () => {
+    flushQuestions();
     flushList(acc);
     if (!part) return;
     if (section) {
@@ -291,15 +402,53 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
       // Prose printed under the part title, before its first section.
       part.intro = [...(part.intro ?? []), ...acc.blocks];
     }
-    acc = { blocks: [], list: null };
+    acc = emptyAccumulator();
   };
 
   const push = (block: Block) => {
+    flushQuestions();
     flushList(acc);
     acc.blocks.push(block);
   };
 
+  /**
+   * The exam prints the option list for a matching or headings task after
+   * the questions, in a panel of its own ("List of headings"). The schema
+   * holds it on the exercise, so it is attached to the set it belongs to
+   * rather than rendered as a loose callout.
+   *
+   * Returns false when there is no such exercise to attach it to, in which
+   * case the caller keeps the panel so no content is lost.
+   */
+  const attachOptions = (panel: BlockOf<"callout">): boolean => {
+    if (!panel.title || !/^list of\b/i.test(panel.title)) return false;
+    if (panel.body.length < 2) return false;
+
+    flushQuestions();
+
+    for (let i = acc.blocks.length - 1; i >= 0; i--) {
+      const block = acc.blocks[i];
+      if (block.kind !== "exercise") continue;
+      const { exercise } = block;
+      if (exercise.options) return false;
+      if (exercise.kind !== "headings" && exercise.kind !== "matching")
+        return false;
+      exercise.options = panel.body;
+      return true;
+    }
+
+    return false;
+  };
+
   for (const node of nodes) {
+    // A numbered question paragraph. These come in runs, and the run as a
+    // whole becomes one exercise, so collect rather than emit.
+    if (node.type === "para" && questionNumber(node) !== null) {
+      flushList(acc);
+      acc.questions.push(node);
+      continue;
+    }
+
     if (node.type === "table") {
       const columns = maxCells(node);
       if (columns > 1) {
@@ -311,7 +460,10 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
       for (const row of node.rows) {
         const cell = row[0];
         if (!cell || cellText(cell) === "") continue;
-        push(classifyPanel(cell));
+
+        const panel = classifyPanel(cell);
+        if (panel.kind === "callout" && attachOptions(panel)) continue;
+        push(panel);
       }
       continue;
     }
@@ -351,12 +503,13 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
 
       case "Heading3":
       case "Heading4":
-        if (text !== "")
-          push({
-            kind: "heading",
-            level: node.style === "Heading3" ? 3 : 4,
-            text,
-          });
+        if (text === "") break;
+        push({
+          kind: "heading",
+          level: node.style === "Heading3" ? 3 : 4,
+          text,
+        });
+        if (node.style === "Heading3") acc.headings.push(text);
         break;
 
       case "ListParagraph": {

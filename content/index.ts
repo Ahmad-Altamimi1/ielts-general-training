@@ -4,8 +4,10 @@
 import type { Part } from "@/lib/content/schema";
 
 import part0 from "./part-1";
+import part1 from "./part-3";
 
 /** Every part, in the order the book prints them. */
 export const parts: Part[] = [
   part0,
+  part1,
 ];

@@ -139,3 +139,50 @@ build.
 
 **The sidebar drawer closes on navigation on mobile**, since otherwise the
 drawer covers the page the student just chose.
+
+## Milestone 4 — exercise engine
+
+**CONFLICT WITH BRIEF — "all five exercise kinds".** The brief's own
+`Exercise` type lists six: `tfng`, `ynng`, `mcq`, `matching`, `gapfill`,
+`headings`. All six are implemented, with the inputs the brief assigns:
+`RadioGroup` for mcq, `Select` for tfng, ynng and headings, `Input` for
+gapfill and matching.
+
+**Questions and answers are joined across the book.** The book keeps them
+apart on purpose — questions in the unit, keys in Appendix B — so that a
+student does not see the key while working. `KEYED_SECTION` in
+`tools/docx/exercises.ts` records which appendix section keys which unit,
+read off the appendix's own headings ("B.4 Practice 4 …" keys section 3.5).
+It is the one table to update if the book gains a unit.
+
+**A question is detected by its formatting, not by a text pattern.** The
+book sets every question number as its own bold run in `1A4E8A` — the same
+deep blue the brief specifies as the accent. That makes the start of a
+question unambiguous and immune to prose that happens to begin with a
+number.
+
+**The book's answer notation is expanded, not interpreted.** `FIFTEEN / 15`
+becomes two accepted answers; `(A) MEDICAL CERTIFICATE` becomes both with
+and without the article. A slash with no spaces around it is left alone,
+because `14/3` is a date and not two answers. This is the only place
+alternatives are created, and it reads them off the book.
+
+**Exercise titles.** The book heads the questions themselves "Now do
+these" but names the task "Practice 4" a little earlier, so the latter is
+used. Where there is no such name, the rubric's own label is — "Questions
+30 to 34". Nothing is invented.
+
+**Marking-state colour, as flagged in Milestone 1.** Correct takes the
+accent; incorrect stays ink and is told apart by its icon, its word, and
+the struck-through response. No red. This keeps the brief's "one accent,
+nowhere else" and its "never colour alone" at the same time, and it is the
+one design point I would put back to you: a second colour for wrong
+answers would be two tokens in `globals.css`.
+
+**The timer runs on past zero** and states the overrun in words next to
+the figure, so it is never the only signal. It never submits.
+
+**The schema now checks that every accepted answer for a matching or
+headings exercise is one of the options offered.** This caught a real bug:
+the rubric parser read "A, B, C or D" as three options and dropped D,
+while the key accepted it.

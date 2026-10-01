@@ -98,15 +98,35 @@ export const exerciseSchema = z
       }
     }
 
-    if (
-      (exercise.kind === "matching" || exercise.kind === "headings") &&
-      !exercise.options
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message: `${exercise.kind} exercise ${exercise.id} needs an options list`,
-        path: ["options"],
-      });
+    if (exercise.kind === "matching" || exercise.kind === "headings") {
+      if (!exercise.options) {
+        ctx.addIssue({
+          code: "custom",
+          message: `${exercise.kind} exercise ${exercise.id} needs an options list`,
+          path: ["options"],
+        });
+      } else {
+        // The student picks from this list, so an accepted answer that is
+        // not in it can never be given — and that means the list is wrong.
+        const labels = new Set(
+          exercise.options.map((option) =>
+            (/^([A-Za-z]+|[ivxIVX]+)\b/.exec(option.trim())?.[1] ?? option)
+              .trim()
+              .toLowerCase(),
+          ),
+        );
+        for (const [i, q] of exercise.questions.entries()) {
+          for (const answer of q.answers) {
+            if (!labels.has(answer.trim().toLowerCase())) {
+              ctx.addIssue({
+                code: "custom",
+                message: `${exercise.id} question ${q.n} accepts "${answer}", which is not one of the ${exercise.options.length} options offered`,
+                path: ["questions", i, "answers"],
+              });
+            }
+          }
+        }
+      }
     }
   });
 
