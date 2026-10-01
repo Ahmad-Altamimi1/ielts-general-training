@@ -51,7 +51,7 @@ export function OnThisPage({ blocks }: { blocks: readonly Block[] }) {
               className="block text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
             >
               {entry.isExercise ? (
-                <span className="font-heading mr-1.5 text-[0.625rem] font-semibold tracking-wide text-brand uppercase">
+                <span className="font-heading mr-1.5 text-[0.625rem] font-semibold tracking-wide text-tone uppercase">
                   Practice
                 </span>
               ) : null}

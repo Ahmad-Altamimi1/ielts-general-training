@@ -14,6 +14,8 @@ export type NavSection = {
 
 export type NavPart = {
   id: string;
+  /** The printed part number, or null for front and back matter. */
+  number: number | null;
   /** "Part 3", or the title for front and back matter. */
   label: string;
   title: string;
@@ -42,6 +44,7 @@ export function navTree(): NavPart[] {
 
     return {
       id: part.id,
+      number: part.number,
       label: partLabel(part),
       title: part.title,
       summary: part.summary,

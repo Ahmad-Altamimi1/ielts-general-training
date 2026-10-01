@@ -1,6 +1,7 @@
 import { Clock, FileText, ListChecks } from "lucide-react";
 
 import type { Block, Part, Section } from "@/lib/content/schema";
+import { skillFor } from "@/lib/content/tone";
 
 /** What this section contains, counted off the blocks so it can never
  *  disagree with the page below it. */
@@ -21,11 +22,6 @@ function summarise(blocks: readonly Block[]) {
   return { exercises, questions, seconds, passages };
 }
 
-function minutes(seconds: number): string {
-  const whole = Math.round(seconds / 60);
-  return `${whole} min`;
-}
-
 export function SectionHeader({
   part,
   section,
@@ -39,45 +35,64 @@ export function SectionHeader({
   position: { index: number; total: number };
 }) {
   const stats = summarise(section.blocks);
+  const skill = skillFor(part.id);
+  const percent = Math.round((position.index / position.total) * 100);
 
   return (
-    <header className="border-b border-layer-border pb-6">
-      <p className="font-heading flex flex-wrap items-center gap-x-2 text-xs font-semibold tracking-wide uppercase">
-        <span className="text-brand">{partLabel}</span>
-        <span aria-hidden="true" className="text-layer-border">
-          /
-        </span>
-        <span className="text-ink-muted">{part.title}</span>
-        <span className="ml-auto font-normal tracking-normal text-ink-muted normal-case">
-          Section {position.index} of {position.total}
-        </span>
-      </p>
+    <header className="panel tone-field relative overflow-hidden rounded-2xl px-5 py-6 sm:px-8 sm:py-8">
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-1.5 bg-tone"
+      />
 
-      <h1 className="font-heading mt-3 flex flex-wrap items-baseline gap-x-3 text-3xl font-semibold tracking-tight sm:text-[2.125rem]">
-        <span className="text-brand tabular-nums">{section.id}</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-heading rounded-md bg-tone-wash px-2 py-0.5 text-[0.6875rem] font-bold tracking-wider text-tone uppercase">
+          {partLabel}
+        </span>
+        <span className="font-heading text-[0.6875rem] font-semibold tracking-wider text-ink-muted uppercase">
+          {skill ?? part.title}
+        </span>
+
+        <span className="ml-auto flex items-center gap-2.5 text-xs text-ink-muted">
+          <span
+            aria-hidden="true"
+            className="hidden h-1 w-20 overflow-hidden rounded-full bg-layer-border sm:block"
+          >
+            <span
+              className="block h-full rounded-full bg-tone"
+              style={{ width: `${percent}%` }}
+            />
+          </span>
+          <span className="tabular-nums">
+            Section {position.index} of {position.total}
+          </span>
+        </span>
+      </div>
+
+      <h1 className="font-heading mt-4 flex flex-wrap items-baseline gap-x-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.5rem]">
+        <span className="text-tone tabular-nums">{section.id}</span>
         <span>{section.title}</span>
       </h1>
 
       {stats.exercises > 0 || stats.passages > 0 ? (
-        <ul className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-muted">
+        <ul className="mt-5 flex flex-wrap items-center gap-2">
           {stats.passages > 0 ? (
-            <li className="flex items-center gap-1.5">
-              <FileText aria-hidden="true" className="size-4" />
+            <li className="flex items-center gap-1.5 rounded-lg border border-layer-border bg-layer-raised px-2.5 py-1.5 text-xs">
+              <FileText aria-hidden="true" className="size-3.5 text-tone" />
               {stats.passages} reading text{stats.passages === 1 ? "" : "s"}
             </li>
           ) : null}
           {stats.exercises > 0 ? (
-            <li className="flex items-center gap-1.5">
-              <ListChecks aria-hidden="true" className="size-4" />
+            <li className="flex items-center gap-1.5 rounded-lg border border-layer-border bg-layer-raised px-2.5 py-1.5 text-xs">
+              <ListChecks aria-hidden="true" className="size-3.5 text-tone" />
               {stats.questions} marked question
               {stats.questions === 1 ? "" : "s"}
-              {stats.exercises > 1 ? ` in ${stats.exercises} sets` : ""}
             </li>
           ) : null}
           {stats.seconds > 0 ? (
-            <li className="flex items-center gap-1.5">
-              <Clock aria-hidden="true" className="size-4" />
-              {minutes(stats.seconds)} of timed practice
+            <li className="flex items-center gap-1.5 rounded-lg border border-layer-border bg-layer-raised px-2.5 py-1.5 text-xs">
+              <Clock aria-hidden="true" className="size-3.5 text-tone" />
+              {Math.round(stats.seconds / 60)} min timed
             </li>
           ) : null}
         </ul>

@@ -55,7 +55,7 @@ export function List({ block }: { block: BlockOf<"list"> }) {
           <li key={i} className="grid grid-cols-[1.75rem_1fr] gap-x-1">
             <span
               aria-hidden="true"
-              className="font-heading pt-px text-sm font-semibold text-brand tabular-nums"
+              className="font-heading pt-px text-sm font-semibold text-tone tabular-nums"
             >
               {i + 1}.
             </span>
@@ -72,7 +72,7 @@ export function List({ block }: { block: BlockOf<"list"> }) {
     <ul className="measure mt-4 space-y-3">
       {block.items.map((item, i) => (
         <li key={i} className="grid grid-cols-[1.75rem_1fr] gap-x-1">
-          <span aria-hidden="true" className="pt-px text-brand">
+          <span aria-hidden="true" className="pt-px text-tone">
             &bull;
           </span>
           <span>
@@ -91,9 +91,9 @@ export function List({ block }: { block: BlockOf<"list"> }) {
  *  put a false signpost in the landmark list. */
 export function Callout({ block }: { block: BlockOf<"callout"> }) {
   return (
-    <div className="measure break-inside-avoid mt-6 border-l-4 border-brand pl-4 sm:pl-5">
+    <div className="measure break-inside-avoid mt-6 border-l-4 border-tone pl-4 sm:pl-5">
       {block.title ? (
-        <p className="font-heading text-sm font-semibold tracking-wide text-brand uppercase">
+        <p className="font-heading text-sm font-semibold tracking-wide text-tone uppercase">
           {block.title}
         </p>
       ) : null}
@@ -179,7 +179,7 @@ export function Passage({ block }: { block: BlockOf<"passage"> }) {
           >
             {paragraph.label ? (
               <>
-                <span className="font-heading text-sm font-semibold text-brand">
+                <span className="font-heading text-sm font-semibold text-tone">
                   {paragraph.label}
                 </span>
                 <span>{paragraph.text}</span>
@@ -209,7 +209,7 @@ export function Worked({ block }: { block: BlockOf<"worked"> }) {
           <li key={i} className="grid grid-cols-[1.75rem_1fr] gap-x-1 text-[0.9375rem]">
             <span
               aria-hidden="true"
-              className="font-heading pt-px text-sm font-semibold text-brand tabular-nums"
+              className="font-heading pt-px text-sm font-semibold text-tone tabular-nums"
             >
               {i + 1}.
             </span>
@@ -222,7 +222,7 @@ export function Worked({ block }: { block: BlockOf<"worked"> }) {
 
       <p className="mt-4 border-t border-rule pt-3 text-sm">
         <span className="text-ink-muted">Answer </span>
-        <span className="font-heading font-semibold text-brand">
+        <span className="font-heading font-semibold text-tone">
           {block.answer}
         </span>
       </p>

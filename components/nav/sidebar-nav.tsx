@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAllProgress } from "@/hooks/use-progress";
 import type { NavPart } from "@/lib/content/nav";
+import { toneFor } from "@/lib/content/tone";
 
 /** True when `href` is the page being viewed. Section ids are
  *  percent-encoded in links, so compare decoded. */
@@ -59,7 +60,7 @@ export function SidebarNav({ tree }: { tree: NavPart[] }) {
               defaultOpen={partIsOpen}
               className="group/part"
             >
-              <SidebarMenuItem>
+              <SidebarMenuItem data-tone={toneFor(part.id)}>
                 <div className="flex items-center gap-0.5">
                   <SidebarMenuButton
                     asChild
@@ -67,26 +68,42 @@ export function SidebarNav({ tree }: { tree: NavPart[] }) {
                     className="h-auto min-w-0 flex-1 py-1.5"
                   >
                     <Link href={part.href} onClick={close}>
+                      <span
+                        aria-hidden="true"
+                        className="font-heading flex size-6 shrink-0 items-center justify-center rounded-md bg-tone-wash text-[0.625rem] font-bold text-tone tabular-nums"
+                      >
+                        {part.number ?? "·"}
+                      </span>
+
                       <span className="flex min-w-0 flex-1 flex-col items-start">
-                        <span className="font-heading flex w-full items-center gap-1.5 text-[0.6875rem] font-semibold tracking-wide text-brand uppercase">
-                          {part.label}
-                          {total > 0 ? (
+                        <span className="w-full truncate text-sm font-medium">
+                          {part.title}
+                        </span>
+                        {total > 0 ? (
+                          <span className="flex w-full items-center gap-1.5 pt-1">
                             <span
-                              className="ml-auto font-normal tracking-normal text-ink-muted tabular-nums normal-case"
-                              title={`${done} of ${total} exercises done`}
+                              aria-hidden="true"
+                              className="h-0.5 flex-1 overflow-hidden rounded-full bg-layer-border"
                             >
+                              <span
+                                className="block h-full rounded-full bg-tone"
+                                style={{
+                                  width: `${(done / total) * 100}%`,
+                                }}
+                              />
+                            </span>
+                            <span className="text-[0.625rem] text-ink-muted tabular-nums">
                               {complete ? (
                                 <Check
                                   aria-hidden="true"
-                                  className="size-3.5 text-mark-correct"
+                                  className="size-3 text-mark-correct"
                                 />
                               ) : (
                                 `${done}/${total}`
                               )}
                             </span>
-                          ) : null}
-                        </span>
-                        <span className="truncate text-sm">{part.title}</span>
+                          </span>
+                        ) : null}
                       </span>
                       {total > 0 ? (
                         <span className="sr-only">
@@ -123,13 +140,13 @@ export function SidebarNav({ tree }: { tree: NavPart[] }) {
                               href={section.href}
                               onClick={close}
                               aria-current={active ? "page" : undefined}
-                              className={`-ml-px flex items-start gap-2 border-l-2 py-1.5 pl-3 text-sm ${
+                              className={`-ml-px flex items-start gap-2 border-l-2 py-1.5 pl-3 text-sm transition ${
                                 active
-                                  ? "border-brand font-medium text-ink"
-                                  : "border-transparent text-ink-muted hover:border-rule hover:text-ink"
+                                  ? "border-tone bg-tone-wash font-medium text-ink"
+                                  : "border-transparent text-ink-muted hover:border-tone/40 hover:text-ink"
                               }`}
                             >
-                              <span className="font-heading shrink-0 pt-px text-xs font-semibold text-brand tabular-nums">
+                              <span className="font-heading shrink-0 pt-px text-xs font-bold text-tone tabular-nums">
                                 {section.id}
                               </span>
                               <span className="min-w-0 flex-1">

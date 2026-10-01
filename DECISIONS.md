@@ -300,3 +300,54 @@ scrolling tables were unreachable by keyboard.
 the content model numbers headings as the book does. The renderer now maps
 the book's level 3 and 4 onto the page's `h2` and `h3`, which is the
 correct outline once the section title is the page's `h1`.
+
+## Revision 2 — a learning product, not a documentation site
+
+You said it still read as documentation. It did, and the reason was
+structural rather than cosmetic: a sidebar beside a single column of
+monochrome prose *is* the documentation layout, so polishing details
+inside it could not change the impression. This changes the visual
+language instead.
+
+**A hue per skill.** Eight tones defined in `globals.css`, one per skill,
+applied by a `data-tone` attribute on a wrapper; everything inside
+inherits it through `--tone`. Listening is violet, Reading blue, Writing
+amber, Speaking rose. The grid of parts now reads as four papers rather
+than eleven chapters, and a student can tell which paper they are in
+before reading a word. Every tone is AA as text on its own page in both
+themes; the washes sit behind badges and card headers only, never behind
+running text.
+
+`lib/content/tone.ts` is the whole map — one object, keyed by part id.
+
+**Depth.** `.panel`, `.panel-lift` and `.tone-field` give interactive
+surfaces real edges, a shadow and a soft field of their own hue. Reading
+surfaces are untouched: passages, tables and callouts keep the
+rules-and-space discipline, because that is what makes them readable
+under time pressure.
+
+**What changed, page by page**
+
+- **Landing**: a gradient hero with the course figures, a "pick up where
+  you left off" card that resolves to the first unmarked exercise, the
+  teacher, and a grid of part cards — each with its skill badge, its hue
+  down the left edge, and a progress bar of its own exercises.
+- **Part pages**: a toned hero with a start button and section count, and
+  sections as a numbered list with hover in the part's hue.
+- **Section pages**: the header is a card carrying the part's tone, a
+  position bar through the part, and chips counting reading texts, marked
+  questions and timed minutes.
+- **Exercises**: a rounded panel with a coloured top rail, the task type
+  as a toned badge, a progress bar that fills as answers go in, and the
+  action bar in the part's hue.
+- **Sidebar**: numbered chips in each part's tone, a progress bar per
+  part, the active section on a toned wash, and a tick on anything
+  attempted.
+- **Progress**: three stat tiles, each in its own tone, over a list
+  grouped by part.
+
+**Re-audited after the change**, since colour was the main risk:
+axe-core on home, part, section and progress pages, light and dark, at
+360px and desktop — zero violations, no horizontal overflow. Marking
+still never depends on colour alone, and print still collapses every tone
+to black on white.

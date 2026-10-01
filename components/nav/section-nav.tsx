@@ -23,14 +23,14 @@ export function SectionNav({
       {previous ? (
         <Link
           href={`/${previous.part.id}/${encodeURIComponent(previous.section.id)}`}
-          className="group flex flex-col gap-1 rounded-sm border border-rule p-4 hover:border-brand"
+          className="panel group flex flex-col gap-1 rounded-xl p-4 transition hover:border-tone hover:panel-lift"
         >
           <span className="flex items-center gap-1.5 text-xs text-ink-muted">
             <ArrowLeft aria-hidden="true" className="size-3.5" />
             Previous
           </span>
           <span className="text-sm">
-            <span className="font-heading font-semibold text-brand tabular-nums">
+            <span className="font-heading font-bold text-tone tabular-nums">
               {previous.section.id}
             </span>{" "}
             {previous.section.title}
@@ -43,14 +43,14 @@ export function SectionNav({
       {next ? (
         <Link
           href={`/${next.part.id}/${encodeURIComponent(next.section.id)}`}
-          className="group flex flex-col gap-1 rounded-sm border border-rule p-4 hover:border-brand sm:items-end sm:text-right"
+          className="panel group flex flex-col gap-1 rounded-xl p-4 transition hover:border-tone hover:panel-lift sm:items-end sm:text-right"
         >
           <span className="flex items-center gap-1.5 text-xs text-ink-muted">
             Next
             <ArrowRight aria-hidden="true" className="size-3.5" />
           </span>
           <span className="text-sm">
-            <span className="font-heading font-semibold text-brand tabular-nums">
+            <span className="font-heading font-bold text-tone tabular-nums">
               {next.section.id}
             </span>{" "}
             {next.section.title}

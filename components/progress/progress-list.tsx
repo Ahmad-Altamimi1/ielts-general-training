@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { useAllProgress } from "@/hooks/use-progress";
 import { useIsHydrated } from "@/hooks/use-hydrated";
 import { clearAllProgress, storageAvailable } from "@/lib/progress";
+import { toneFor } from "@/lib/content/tone";
 
 export type ExerciseSummary = {
   id: string;
@@ -49,20 +50,22 @@ function Stat({
   label,
   value,
   detail,
+  tone,
 }: {
   label: string;
   value: string;
   detail: string;
+  tone: string;
 }) {
   return (
-    <div className="rounded-md border border-layer-border bg-layer-raised px-4 py-3.5">
-      <p className="font-heading text-[0.6875rem] font-semibold tracking-wide text-ink-muted uppercase">
+    <div data-tone={tone} className="panel tone-field rounded-xl px-5 py-4">
+      <p className="font-heading text-[0.6875rem] font-bold tracking-wider text-tone uppercase">
         {label}
       </p>
-      <p className="font-heading mt-1.5 text-3xl font-semibold tabular-nums">
+      <p className="font-heading mt-2 text-4xl font-bold tabular-nums">
         {value}
       </p>
-      <p className="mt-0.5 text-sm text-ink-muted">{detail}</p>
+      <p className="mt-1 text-sm text-ink-muted">{detail}</p>
     </div>
   );
 }
@@ -112,11 +115,13 @@ export function ProgressList({ exercises }: { exercises: ExerciseSummary[] }) {
         </h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <Stat
+            tone="blue"
             label="Exercises done"
             value={`${attempted.length}`}
             detail={`of ${exercises.length} in the course`}
           />
           <Stat
+            tone="violet"
             label="Marks"
             value={marks.total === 0 ? "—" : `${marks.score}/${marks.total}`}
             detail={
@@ -126,6 +131,7 @@ export function ProgressList({ exercises }: { exercises: ExerciseSummary[] }) {
             }
           />
           <Stat
+            tone="emerald"
             label="Accuracy"
             value={marks.total === 0 ? "—" : `${accuracy}%`}
             detail={
@@ -149,13 +155,15 @@ export function ProgressList({ exercises }: { exercises: ExerciseSummary[] }) {
           {[...byPart].map(([key, group]) => {
             const [label, title] = key.split("\u0000");
             return (
-              <div key={key}>
+              <div key={key} data-tone={toneFor(group[0].partId)}>
                 <h3 className="font-heading flex items-baseline gap-2 text-sm font-semibold">
-                  <span className="text-brand">{label}</span>
+                  <span className="rounded-md bg-tone-wash px-2 py-0.5 text-[0.6875rem] font-bold tracking-wider text-tone uppercase">
+                    {label}
+                  </span>
                   <span className="text-ink-muted">{title}</span>
                 </h3>
 
-                <ul className="mt-2 overflow-hidden rounded-md border border-layer-border bg-layer-raised">
+                <ul className="panel mt-2.5 overflow-hidden rounded-xl">
                   {group.map((exercise) => {
                     const record = progress[exercise.id];
                     return (
@@ -165,7 +173,7 @@ export function ProgressList({ exercises }: { exercises: ExerciseSummary[] }) {
                       >
                         <Link
                           href={exercise.href}
-                          className="grid items-center gap-x-4 gap-y-1 px-4 py-3 hover:bg-surface-hover focus-visible:bg-surface-hover sm:grid-cols-[1fr_auto]"
+                          className="grid items-center gap-x-4 gap-y-1 px-4 py-3.5 transition hover:bg-tone-wash focus-visible:bg-tone-wash sm:grid-cols-[1fr_auto]"
                         >
                           <span className="min-w-0">
                             <span className="block">

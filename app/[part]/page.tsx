@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ListChecks } from "lucide-react";
 
 import { Blocks } from "@/components/content/block-renderer";
 import { Breadcrumbs } from "@/components/nav/breadcrumbs";
@@ -10,6 +10,7 @@ import {
   parts,
   sectionHref,
 } from "@/lib/content/registry";
+import { skillFor, toneFor } from "@/lib/content/tone";
 import type { Section } from "@/lib/content/schema";
 
 export function generateStaticParams() {
@@ -31,52 +32,83 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
   if (!part) notFound();
 
   const first = part.sections[0];
+  const skill = skillFor(part.id);
+  const exercises = part.sections.reduce(
+    (n, section) => n + countExercises(section),
+    0,
+  );
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div data-tone={toneFor(part.id)} className="mx-auto w-full max-w-6xl pb-10">
       <Breadcrumbs
         trail={[{ label: "Course", href: "/" }, { label: partLabel(part) }]}
       />
 
       <article className="mt-4">
-        <header className="border-b border-layer-border pb-8">
-          {part.number === null ? null : (
-            <p className="font-heading text-sm font-semibold tracking-wide text-brand uppercase">
-              Part {part.number}
-            </p>
-          )}
-          <h1 className="font-heading mt-2 text-4xl font-semibold tracking-tight">
+        <header className="panel tone-field relative overflow-hidden rounded-2xl px-6 py-8 sm:px-10 sm:py-10">
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 left-0 w-1.5 bg-tone"
+          />
+
+          <div className="flex flex-wrap items-center gap-2">
+            {part.number === null ? null : (
+              <span className="font-heading rounded-md bg-tone-wash px-2.5 py-1 text-xs font-bold tracking-wider text-tone uppercase">
+                Part {part.number}
+              </span>
+            )}
+            {skill ? (
+              <span className="font-heading text-xs font-semibold tracking-wider text-ink-muted uppercase">
+                {skill}
+              </span>
+            ) : null}
+          </div>
+
+          <h1 className="font-heading mt-4 max-w-2xl text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl">
             {part.title}
           </h1>
           <p className="measure mt-3 text-lg text-ink-muted">{part.summary}</p>
 
-          {first ? (
-            <p className="mt-6">
+          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+            {first ? (
               <Link
                 href={sectionHref(part.id, first.id)}
-                className="font-heading inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink hover:opacity-90"
+                className="font-heading inline-flex items-center gap-2 rounded-lg bg-tone px-4 py-2.5 text-sm font-semibold text-brand-ink transition hover:opacity-90"
               >
                 Start at {first.id} {first.title}
                 <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
+            ) : null}
+
+            <p className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-ink-muted">
+              <span className="tabular-nums">
+                {part.sections.length} section
+                {part.sections.length === 1 ? "" : "s"}
+              </span>
+              {exercises > 0 ? (
+                <span className="flex items-center gap-1.5 tabular-nums">
+                  <ListChecks aria-hidden="true" className="size-4" />
+                  {exercises} exercise{exercises === 1 ? "" : "s"}
+                </span>
+              ) : null}
             </p>
-          ) : null}
+          </div>
         </header>
 
         {part.intro?.length ? (
-          <div className="mt-8 space-y-4">
+          <div className="mt-10 space-y-4">
             <Blocks blocks={part.intro} />
           </div>
         ) : null}
 
         {part.sections.length > 0 ? (
           <nav aria-label={`Sections of ${partLabel(part)}`} className="mt-10">
-            <h2 className="font-heading text-xs font-semibold tracking-wide text-ink-muted uppercase">
+            <h2 className="font-heading text-xs font-bold tracking-wider text-ink-muted uppercase">
               Sections
             </h2>
-            <ul className="mt-3 overflow-hidden rounded-md border border-layer-border bg-layer-raised">
-              {part.sections.map((section) => {
-                const exercises = countExercises(section);
+            <ul className="panel mt-4 overflow-hidden rounded-xl">
+              {part.sections.map((section, i) => {
+                const count = countExercises(section);
                 return (
                   <li
                     key={section.id}
@@ -84,19 +116,31 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
                   >
                     <Link
                       href={sectionHref(part.id, section.id)}
-                      className="grid grid-cols-[3.5rem_1fr_auto] items-baseline gap-x-3 px-4 py-3.5 hover:bg-surface-hover focus-visible:bg-surface-hover"
+                      className="group flex items-center gap-4 px-4 py-4 transition hover:bg-tone-wash sm:px-5"
                     >
-                      <span className="font-heading text-sm font-semibold text-brand tabular-nums">
-                        {section.id}
+                      <span
+                        aria-hidden="true"
+                        className="font-heading flex size-9 shrink-0 items-center justify-center rounded-lg bg-tone-wash text-sm font-bold text-tone tabular-nums"
+                      >
+                        {i + 1}
                       </span>
-                      <span className="min-w-0">{section.title}</span>
-                      {exercises > 0 ? (
-                        <span className="text-xs text-ink-muted tabular-nums">
-                          {exercises} exercise{exercises === 1 ? "" : "s"}
+
+                      <span className="min-w-0 flex-1">
+                        <span className="font-heading block font-semibold">
+                          {section.title}
                         </span>
-                      ) : (
-                        <span />
-                      )}
+                        <span className="mt-0.5 block text-xs text-ink-muted tabular-nums">
+                          {section.id}
+                          {count > 0
+                            ? ` · ${count} exercise${count === 1 ? "" : "s"}`
+                            : ""}
+                        </span>
+                      </span>
+
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-tone"
+                      />
                     </Link>
                   </li>
                 );

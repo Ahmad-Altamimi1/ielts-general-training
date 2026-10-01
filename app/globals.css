@@ -7,10 +7,14 @@
 /* ===================================================================== *
  * Design tokens
  *
- * Instructional-materials discipline, not SaaS documentation:
- *   - black on white, one accent (deep blue), nowhere else
- *   - structure from rules and space, never from filled boxes
- *   - serif for reading passages, sans for everything else
+ * A learning product, not a documentation site. Reading surfaces keep
+ * their discipline — serif passages, rules not boxes, a strict measure —
+ * but the course around them has colour, depth and identity:
+ *
+ *   - each part carries the hue of the skill it teaches, so the student
+ *     always knows which paper they are in
+ *   - interactive surfaces are raised panels with real edges
+ *   - the reading itself stays black on white
  *
  * Components must never hard-code a colour. Every value lives here.
  * NOTE: shadcn owns `--accent` for its neutral hover surface, so the
@@ -37,13 +41,41 @@
   --surface-hover: #ebebec;
 
   /* -- Layering -------------------------------------------------------
-   * Three depths only: the page, a panel on it, and a panel's own header
-   * strip. Enough to tell an interactive surface from running text
-   * without reaching for shadows or fills behind body copy.            */
-  --layer-page: #ffffff;
+   * The page, a panel on it, and a panel's own header strip, plus two
+   * shadows. Enough to tell an interactive surface from running text
+   * without putting a fill behind body copy.                           */
+  --layer-page: #fbfbfc;
   --layer-raised: #ffffff;
-  --layer-strip: #f7f7f8;
-  --layer-border: #e3e3e6;
+  --layer-strip: #f6f7f9;
+  --layer-border: #e4e6ea;
+  --shadow-panel: 0 1px 2px rgb(16 24 40 / 0.04), 0 1px 3px rgb(16 24 40 / 0.06);
+  --shadow-lift: 0 4px 10px rgb(16 24 40 / 0.07), 0 12px 24px rgb(16 24 40 / 0.06);
+
+  /* -- Skill tones ----------------------------------------------------
+   * One hue per skill. Each `tone` is legible as text on the page
+   * (WCAG AA); each `wash` sits behind nothing but a small badge or a
+   * card's header, never behind running text.                          */
+  --tone-slate: #475569; /* 7.0:1 */
+  --tone-violet: #6d28d9; /* 7.0:1 */
+  --tone-blue: #1d4ed8; /* 7.4:1 */
+  --tone-amber: #b45309; /* 4.6:1 */
+  --tone-rose: #be123c; /* 6.0:1 */
+  --tone-teal: #0f766e; /* 4.9:1 */
+  --tone-emerald: #047857; /* 4.8:1 */
+  --tone-cyan: #0e7490; /* 4.6:1 */
+
+  --wash-slate: #f1f5f9;
+  --wash-violet: #f5f1fe;
+  --wash-blue: #eff4ff;
+  --wash-amber: #fef5e7;
+  --wash-rose: #fff1f3;
+  --wash-teal: #effbf8;
+  --wash-emerald: #ecfdf3;
+  --wash-cyan: #ecfbff;
+
+  /* The tone in force. Set per part by `data-tone`; defaults to brand. */
+  --tone: var(--brand);
+  --tone-wash: var(--wash-blue);
 
   /* -- Typography ----------------------------------------------------- */
   --measure: 72ch; /* 70-78 characters of body text */
@@ -120,10 +152,30 @@
   --surface-muted: #1a1a1a;
   --surface-hover: #242424;
 
-  --layer-page: #0f0f0f;
-  --layer-raised: #161616;
-  --layer-strip: #1c1c1c;
-  --layer-border: #2e2e2e;
+  --layer-page: #0c0d10;
+  --layer-raised: #15171c;
+  --layer-strip: #1a1d23;
+  --layer-border: #2a2e37;
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-lift: 0 6px 16px rgb(0 0 0 / 0.5), 0 18px 36px rgb(0 0 0 / 0.35);
+
+  --tone-slate: #94a3b8;
+  --tone-violet: #a78bfa;
+  --tone-blue: #60a5fa;
+  --tone-amber: #fbbf24;
+  --tone-rose: #fb7185;
+  --tone-teal: #2dd4bf;
+  --tone-emerald: #34d399;
+  --tone-cyan: #22d3ee;
+
+  --wash-slate: #171b21;
+  --wash-violet: #1b1730;
+  --wash-blue: #10192c;
+  --wash-amber: #231a0c;
+  --wash-rose: #2a1419;
+  --wash-teal: #0c2320;
+  --wash-emerald: #0c2218;
+  --wash-cyan: #0a2029;
 
   --mark-correct: #4ade80; /* 11.0:1 on paper */
   --mark-incorrect: #f87171; /*  6.9:1 on paper */
@@ -132,6 +184,42 @@
   --mark-incorrect-wash: #231314;
 
   --timer-overrun: #f08c8c; /* 7.8:1 on paper */
+}
+
+
+/* A part sets its skill tone once, on a wrapper; everything inside
+   inherits it through --tone. */
+[data-tone="slate"] {
+  --tone: var(--tone-slate);
+  --tone-wash: var(--wash-slate);
+}
+[data-tone="violet"] {
+  --tone: var(--tone-violet);
+  --tone-wash: var(--wash-violet);
+}
+[data-tone="blue"] {
+  --tone: var(--tone-blue);
+  --tone-wash: var(--wash-blue);
+}
+[data-tone="amber"] {
+  --tone: var(--tone-amber);
+  --tone-wash: var(--wash-amber);
+}
+[data-tone="rose"] {
+  --tone: var(--tone-rose);
+  --tone-wash: var(--wash-rose);
+}
+[data-tone="teal"] {
+  --tone: var(--tone-teal);
+  --tone-wash: var(--wash-teal);
+}
+[data-tone="emerald"] {
+  --tone: var(--tone-emerald);
+  --tone-wash: var(--wash-emerald);
+}
+[data-tone="cyan"] {
+  --tone: var(--tone-cyan);
+  --tone-wash: var(--wash-cyan);
 }
 
 @theme inline {
@@ -150,6 +238,8 @@
   --color-mark-unanswered: var(--mark-unanswered);
   --color-mark-correct-wash: var(--mark-correct-wash);
   --color-mark-incorrect-wash: var(--mark-incorrect-wash);
+  --color-tone: var(--tone);
+  --color-tone-wash: var(--tone-wash);
   --color-layer-page: var(--layer-page);
   --color-layer-raised: var(--layer-raised);
   --color-layer-strip: var(--layer-strip);
@@ -254,6 +344,10 @@
     --mark-unanswered: #333333;
     --mark-correct-wash: #ffffff;
     --mark-incorrect-wash: #ffffff;
+    --tone: #000000;
+    --tone-wash: #ffffff;
+    --shadow-panel: none;
+    --shadow-lift: none;
   }
 
   html,
@@ -339,6 +433,28 @@
   /* Caps the line length of body copy at a readable measure. */
   .measure {
     max-width: var(--measure);
+  }
+
+  /* Depth for interactive surfaces. Never behind running text. */
+  .panel {
+    background: var(--layer-raised);
+    border: 1px solid var(--layer-border);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .panel-lift {
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* A soft field of the part's own hue, for a hero or a card header. */
+  .tone-field {
+    background:
+      radial-gradient(
+        120% 140% at 0% 0%,
+        var(--tone-wash) 0%,
+        transparent 60%
+      ),
+      var(--layer-raised);
   }
 
   .measure-narrow {

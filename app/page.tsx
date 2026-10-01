@@ -1,82 +1,102 @@
-import Link from "next/link";
-import { ArrowRight, BookOpen, ListChecks, Timer } from "lucide-react";
+import { BookOpen, ListChecks, MessageSquare, Timer } from "lucide-react";
 
+import { ContinueCard, type ResumePoint } from "@/components/home/continue-card";
+import { PartCard } from "@/components/home/part-card";
 import { navTree } from "@/lib/content/nav";
-import { allExercises } from "@/lib/content/registry";
+import { allExercises, partLabel, sectionHref } from "@/lib/content/registry";
+import { toneFor } from "@/lib/content/tone";
 import { COURSE } from "@/lib/course";
 
-const PROMISE_ICONS = [ListChecks, BookOpen, Timer, ArrowRight] as const;
+const PROMISE_ICONS = [ListChecks, BookOpen, Timer, MessageSquare] as const;
 
 export default function HomePage() {
   const tree = navTree();
-  const first = tree.find((part) => part.sections.length > 0);
+
   const questions = allExercises.reduce(
     (n, { exercise }) => n + exercise.questions.length,
     0,
   );
   const sections = tree.reduce((n, part) => n + part.sections.length, 0);
 
+  const resume: ResumePoint[] = allExercises.map(
+    ({ part, section, exercise }) => ({
+      exerciseId: exercise.id,
+      exerciseTitle: exercise.title,
+      partLabel: partLabel(part),
+      partTitle: part.title,
+      sectionId: section.id,
+      sectionTitle: section.title,
+      href: `${sectionHref(part.id, section.id)}#${exercise.id}-title`,
+      tone: toneFor(part.id),
+    }),
+  );
+
   return (
-    <div className="mx-auto w-full max-w-6xl pb-8">
-      <header className="border-b border-layer-border pb-10">
-        <p className="font-heading text-sm font-semibold tracking-wide text-brand uppercase">
-          {COURSE.level}
-        </p>
+    <div className="mx-auto w-full max-w-6xl pb-10">
+      {/* ---- Hero ---------------------------------------------------- */}
+      <section className="relative overflow-hidden rounded-2xl border border-layer-border bg-layer-raised">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(90%_120%_at_12%_0%,var(--wash-blue)_0%,transparent_55%),radial-gradient(70%_110%_at_100%_10%,var(--wash-rose)_0%,transparent_50%)]"
+        />
 
-        <h1 className="font-heading measure mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-          {COURSE.title}
-        </h1>
+        <div className="relative px-6 py-10 sm:px-10 sm:py-14">
+          <p className="font-heading inline-flex items-center gap-2 rounded-full border border-layer-border bg-layer-raised px-3 py-1 text-[0.6875rem] font-bold tracking-wider text-brand uppercase">
+            {COURSE.level}
+          </p>
 
-        <p className="measure mt-4 text-lg text-ink-muted">{COURSE.tagline}</p>
+          <h1 className="font-heading mt-5 max-w-3xl text-4xl leading-[1.08] font-bold tracking-tight text-balance sm:text-6xl">
+            {COURSE.title}
+          </h1>
 
-        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
-          <Link
-            href={first ? first.sections[0].href : "/progress"}
-            className="font-heading inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink hover:opacity-90"
-          >
-            Start the course
-            <ArrowRight aria-hidden="true" className="size-4" />
-          </Link>
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">
+            {COURSE.tagline}
+          </p>
 
-          <dl className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
-            <div className="flex items-baseline gap-1.5">
-              <dt className="sr-only">Parts</dt>
-              <dd className="font-heading font-semibold tabular-nums">
-                {tree.length}
-              </dd>
-              <span className="text-ink-muted">parts</span>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt className="sr-only">Sections</dt>
-              <dd className="font-heading font-semibold tabular-nums">
-                {sections}
-              </dd>
-              <span className="text-ink-muted">sections</span>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt className="sr-only">Marked questions</dt>
-              <dd className="font-heading font-semibold tabular-nums">
-                {questions}
-              </dd>
-              <span className="text-ink-muted">marked questions</span>
-            </div>
+          <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-4">
+            {[
+              { n: tree.length, label: "parts" },
+              { n: sections, label: "sections" },
+              { n: questions, label: "marked questions" },
+              { n: allExercises.length, label: "exercises" },
+            ].map((stat) => (
+              <div key={stat.label}>
+                <dd className="font-heading text-3xl font-bold tabular-nums">
+                  {stat.n}
+                </dd>
+                <dt className="mt-0.5 text-sm text-ink-muted">{stat.label}</dt>
+              </div>
+            ))}
           </dl>
+
+          <div className="mt-8 max-w-xl">
+            <ContinueCard points={resume} />
+          </div>
+
+          <p className="mt-8 flex items-center gap-3 border-t border-layer-border pt-5">
+            <span
+              aria-hidden="true"
+              className="font-heading flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-ink"
+            >
+              {COURSE.teacherName.slice(0, 1)}
+            </span>
+            <span>
+              <span className="block text-xs tracking-wide text-ink-muted uppercase">
+                {COURSE.teacherRole}
+              </span>
+              <span className="font-heading block font-semibold tracking-tight">
+                {COURSE.teacherName}
+              </span>
+            </span>
+          </p>
         </div>
+      </section>
 
-        <p className="mt-8 inline-block rounded-md border-l-4 border-brand bg-layer-raised py-2.5 pr-5 pl-4">
-          <span className="block text-xs tracking-wide text-ink-muted uppercase">
-            {COURSE.teacherRole}
-          </span>
-          <span className="font-heading mt-0.5 block text-xl font-semibold tracking-tight">
-            {COURSE.teacherName}
-          </span>
-        </p>
-      </header>
-
-      <section className="mt-10" aria-labelledby="what-this-does">
+      {/* ---- What it does -------------------------------------------- */}
+      <section className="mt-12" aria-labelledby="what-this-does">
         <h2
           id="what-this-does"
-          className="font-heading text-xs font-semibold tracking-wide text-ink-muted uppercase"
+          className="font-heading text-xs font-bold tracking-wider text-ink-muted uppercase"
         >
           What this does that paper cannot
         </h2>
@@ -84,56 +104,41 @@ export default function HomePage() {
           {COURSE.promises.map((promise, i) => {
             const Icon = PROMISE_ICONS[i] ?? ListChecks;
             return (
-              <li
-                key={promise.title}
-                className="rounded-md border border-layer-border bg-layer-raised p-4"
-              >
-                <Icon aria-hidden="true" className="size-5 text-brand" />
-                <h3 className="font-heading mt-2.5 text-sm font-semibold">
+              <li key={promise.title} className="panel rounded-xl p-5">
+                <span
+                  aria-hidden="true"
+                  className="flex size-9 items-center justify-center rounded-lg bg-tone-wash text-tone"
+                >
+                  <Icon className="size-4.5" />
+                </span>
+                <h3 className="font-heading mt-3.5 font-semibold">
                   {promise.title}
                 </h3>
-                <p className="mt-1 text-sm text-ink-muted">{promise.body}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                  {promise.body}
+                </p>
               </li>
             );
           })}
         </ul>
       </section>
 
-      <nav aria-label="Course contents" className="mt-12">
-        <h2 className="font-heading text-xs font-semibold tracking-wide text-ink-muted uppercase">
-          Contents
+      {/* ---- The course ---------------------------------------------- */}
+      <section className="mt-12" aria-labelledby="contents">
+        <h2
+          id="contents"
+          className="font-heading text-xs font-bold tracking-wider text-ink-muted uppercase"
+        >
+          The course
         </h2>
-        <ul className="mt-3 grid gap-3 md:grid-cols-2">
+        <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {tree.map((part) => (
             <li key={part.id}>
-              <Link
-                href={part.href}
-                className="group flex h-full gap-4 rounded-md border border-layer-border bg-layer-raised p-4 hover:border-brand"
-              >
-                <span className="font-heading w-14 shrink-0 text-xs font-semibold tracking-wide text-brand uppercase">
-                  {part.label}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="font-heading block font-semibold">
-                    {part.title}
-                  </span>
-                  <span className="mt-0.5 block text-sm text-ink-muted">
-                    {part.summary}
-                  </span>
-                  {part.sections.length > 0 ? (
-                    <span className="mt-2 block text-xs text-ink-muted tabular-nums">
-                      {part.sections.length} sections
-                      {part.exerciseIds.length > 0
-                        ? ` · ${part.exerciseIds.length} exercises`
-                        : ""}
-                    </span>
-                  ) : null}
-                </span>
-              </Link>
+              <PartCard part={part} />
             </li>
           ))}
         </ul>
-      </nav>
+      </section>
     </div>
   );
 }

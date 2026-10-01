@@ -76,10 +76,14 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
   return (
     <section
       aria-labelledby={`${exercise.id}-title`}
-      className="mt-10 scroll-mt-20 overflow-hidden rounded-md border border-layer-border bg-layer-raised break-inside-avoid"
+      className="panel mt-10 scroll-mt-20 overflow-hidden rounded-2xl break-inside-avoid"
     >
       {/* Header strip: what this is, how many, how long. */}
-      <header className="border-b border-layer-border bg-layer-strip px-4 py-3.5 sm:px-6">
+      <header className="tone-field relative overflow-hidden border-b border-layer-border px-4 py-4 sm:px-6">
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-1 bg-tone"
+        />
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
           <h3
             id={`${exercise.id}-title`}
@@ -87,7 +91,7 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
           >
             {exercise.title}
           </h3>
-          <span className="font-heading rounded-full border border-layer-border px-2 py-0.5 text-[0.6875rem] font-semibold tracking-wide text-ink-muted uppercase">
+          <span className="font-heading rounded-md bg-tone-wash px-2 py-0.5 text-[0.6875rem] font-bold tracking-wider text-tone uppercase">
             {KIND_LABEL[exercise.kind]}
           </span>
           <span className="ml-auto flex items-center gap-1.5 text-sm text-ink-muted">
@@ -132,7 +136,7 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
             >
               <span
                 aria-hidden="true"
-                className="font-heading pt-px text-sm font-semibold text-brand tabular-nums"
+                className="font-heading pt-px text-sm font-bold text-tone tabular-nums"
               >
                 {question.n}.
               </span>
@@ -159,10 +163,28 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
         })}
       </ol>
 
-      <footer className="print-hidden flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-layer-border bg-layer-strip px-4 py-3.5 sm:px-6">
+      <footer className="print-hidden border-t border-layer-border bg-layer-strip px-4 py-4 sm:px-6">
+        {/* How far through the set the student is, before they check. */}
+        {result === null ? (
+          <span
+            aria-hidden="true"
+            className="mb-3.5 block h-1 overflow-hidden rounded-full bg-layer-border"
+          >
+            <span
+              className="block h-full rounded-full bg-tone transition-[width] duration-300"
+              style={{ width: `${count === 0 ? 0 : (answered / count) * 100}%` }}
+            />
+          </span>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         {result === null ? (
           <>
-            <Button type="button" onClick={check}>
+            <Button
+              type="button"
+              onClick={check}
+              className="bg-tone text-brand-ink hover:bg-tone hover:opacity-90"
+            >
               <CheckCircle2 aria-hidden="true" className="size-4" />
               Check answers
             </Button>
@@ -196,6 +218,7 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
             </Button>
           </>
         )}
+        </div>
       </footer>
 
       {/* The score reaches a screen reader as soon as marking happens,

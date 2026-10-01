@@ -11,6 +11,7 @@ import {
   partHref,
   partLabel,
 } from "@/lib/content/registry";
+import { toneFor } from "@/lib/content/tone";
 
 export function generateStaticParams() {
   return allSections.map(({ part, section }) => ({
@@ -39,7 +40,10 @@ export default async function SectionPage({
   const index = part.sections.findIndex((s) => s.id === section.id);
 
   return (
-    <div className="mx-auto w-full max-w-6xl">
+    <div
+      data-tone={toneFor(part.id)}
+      className="mx-auto w-full max-w-6xl pb-10"
+    >
       <Breadcrumbs
         trail={[
           { label: "Course", href: "/" },
