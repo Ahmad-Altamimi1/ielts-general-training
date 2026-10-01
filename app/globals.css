@@ -36,6 +36,15 @@
   --surface-muted: #f4f4f5;
   --surface-hover: #ebebec;
 
+  /* -- Layering -------------------------------------------------------
+   * Three depths only: the page, a panel on it, and a panel's own header
+   * strip. Enough to tell an interactive surface from running text
+   * without reaching for shadows or fills behind body copy.            */
+  --layer-page: #ffffff;
+  --layer-raised: #ffffff;
+  --layer-strip: #f7f7f8;
+  --layer-border: #e3e3e6;
+
   /* -- Typography ----------------------------------------------------- */
   --measure: 72ch; /* 70-78 characters of body text */
   --measure-narrow: 62ch;
@@ -45,15 +54,16 @@
   --leading-passage: 1.7;
 
   /* -- Marking states -------------------------------------------------
-   * Colour is redundant here by design: every state also carries an
-   * icon and a text label, so a colour-blind student reads the same
-   * score. Correct takes the accent; incorrect stays ink and is marked
-   * by its icon, its label and a struck-through response.             */
-  --mark-correct: var(--brand);
-  --mark-correct-rule: var(--brand);
-  --mark-incorrect: var(--ink);
-  --mark-incorrect-rule: var(--ink);
-  --mark-unanswered: var(--ink-muted);
+   * Green and red, because a student reviewing their own paper reads a
+   * score faster in colour than in anything else. Colour is never the
+   * only signal: every state also carries an icon and a word, so a
+   * colour-blind student reads exactly the same result.
+   * Both meet WCAG AA against the page in this theme.                 */
+  --mark-correct: #15803d; /* 5.0:1 on paper */
+  --mark-incorrect: #b91c1c; /* 6.5:1 on paper */
+  --mark-unanswered: #595959; /* 7.0:1 on paper */
+  --mark-correct-wash: #f0fdf4;
+  --mark-incorrect-wash: #fef2f2;
 
   /* -- Timer ----------------------------------------------------------
    * Overrun is information, not a failure state. It is never the only
@@ -110,6 +120,17 @@
   --surface-muted: #1a1a1a;
   --surface-hover: #242424;
 
+  --layer-page: #0f0f0f;
+  --layer-raised: #161616;
+  --layer-strip: #1c1c1c;
+  --layer-border: #2e2e2e;
+
+  --mark-correct: #4ade80; /* 11.0:1 on paper */
+  --mark-incorrect: #f87171; /*  6.9:1 on paper */
+  --mark-unanswered: #a6a6a6; /*  7.9:1 on paper */
+  --mark-correct-wash: #112017;
+  --mark-incorrect-wash: #231314;
+
   --timer-overrun: #f08c8c; /* 7.8:1 on paper */
 }
 
@@ -127,6 +148,12 @@
   --color-mark-correct: var(--mark-correct);
   --color-mark-incorrect: var(--mark-incorrect);
   --color-mark-unanswered: var(--mark-unanswered);
+  --color-mark-correct-wash: var(--mark-correct-wash);
+  --color-mark-incorrect-wash: var(--mark-incorrect-wash);
+  --color-layer-page: var(--layer-page);
+  --color-layer-raised: var(--layer-raised);
+  --color-layer-strip: var(--layer-strip);
+  --color-layer-border: var(--layer-border);
   --color-timer-running: var(--timer-running);
   --color-timer-overrun: var(--timer-overrun);
 
@@ -218,6 +245,15 @@
     --surface-muted: #ffffff;
     --surface-hover: #ffffff;
     --timer-overrun: #000000;
+    --layer-page: #ffffff;
+    --layer-raised: #ffffff;
+    --layer-strip: #ffffff;
+    --layer-border: #999999;
+    --mark-correct: #000000;
+    --mark-incorrect: #000000;
+    --mark-unanswered: #333333;
+    --mark-correct-wash: #ffffff;
+    --mark-incorrect-wash: #ffffff;
   }
 
   html,

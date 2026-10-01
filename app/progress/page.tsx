@@ -19,14 +19,16 @@ export default function ProgressPage() {
     id: exercise.id,
     title: exercise.title,
     questionCount: exercise.questions.length,
+    partId: part.id,
     partLabel: partLabel(part),
+    partTitle: part.title,
     sectionId: section.id,
     sectionTitle: section.title,
     href: sectionHref(part.id, section.id),
   }));
 
   return (
-    <div>
+    <div className="mx-auto w-full max-w-6xl">
       <Breadcrumbs
         trail={[{ label: "Course", href: "/" }, { label: "Your progress" }]}
       />

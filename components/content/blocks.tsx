@@ -1,5 +1,6 @@
 import { InlineMarkdown } from "@/components/content/inline-markdown";
 import type { BlockOf } from "@/lib/content/schema";
+import { slugify } from "@/lib/slug";
 
 /* ===================================================================== *
  * Block renderers.
@@ -17,16 +18,30 @@ export function Prose({ block }: { block: BlockOf<"prose"> }) {
   );
 }
 
+/**
+ * The content model numbers headings as the book does: the part is level
+ * 1, the section level 2, so headings inside a section are 3 and 4. A
+ * section page puts the section title in its `h1`, which moves everything
+ * under it up one — and a page whose headings jump from `h1` to `h3` has
+ * a broken outline for anyone reading by headings.
+ */
 export function Heading({ block }: { block: BlockOf<"heading"> }) {
-  const className =
-    block.level === 3
-      ? "font-heading mt-10 text-xl font-semibold tracking-tight"
-      : "font-heading mt-8 text-base font-semibold tracking-tight";
+  const id = slugify(block.text);
 
   return block.level === 3 ? (
-    <h3 className={className}>{block.text}</h3>
+    <h2
+      id={id}
+      className="font-heading mt-12 scroll-mt-20 text-xl font-semibold tracking-tight"
+    >
+      {block.text}
+    </h2>
   ) : (
-    <h4 className={className}>{block.text}</h4>
+    <h3
+      id={id}
+      className="font-heading mt-8 scroll-mt-20 text-base font-semibold tracking-tight"
+    >
+      {block.text}
+    </h3>
   );
 }
 
@@ -69,10 +84,14 @@ export function List({ block }: { block: BlockOf<"list"> }) {
   );
 }
 
-/** A thick accent bar on the left edge, no background fill. */
+/** A thick accent bar on the left edge, no background fill.
+ *
+ *  A plain div, not an `aside`: a callout in the middle of a lesson is
+ *  part of the lesson, and marking it as a complementary landmark would
+ *  put a false signpost in the landmark list. */
 export function Callout({ block }: { block: BlockOf<"callout"> }) {
   return (
-    <aside className="measure break-inside-avoid mt-6 border-l-4 border-brand pl-4 sm:pl-5">
+    <div className="measure break-inside-avoid mt-6 border-l-4 border-brand pl-4 sm:pl-5">
       {block.title ? (
         <p className="font-heading text-sm font-semibold tracking-wide text-brand uppercase">
           {block.title}
@@ -83,7 +102,7 @@ export function Callout({ block }: { block: BlockOf<"callout"> }) {
           <InlineMarkdown md={paragraph} />
         </p>
       ))}
-    </aside>
+    </div>
   );
 }
 
@@ -92,7 +111,15 @@ export function ContentTable({ block }: { block: BlockOf<"table"> }) {
   const total = block.widths?.reduce((sum, w) => sum + w, 0);
 
   return (
-    <div className="break-inside-avoid mt-6 -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    // A table wider than a phone scrolls sideways, so the scroll container
+    // has to be reachable by keyboard: otherwise the right-hand columns
+    // are unreadable without a mouse.
+    <div
+      role="region"
+      aria-label={`${block.headers[0] || "Data"} table`}
+      tabIndex={0}
+      className="break-inside-avoid -mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+    >
       <table className="w-full min-w-xl border-collapse text-left text-[0.9375rem]">
         {block.widths && total ? (
           <colgroup>

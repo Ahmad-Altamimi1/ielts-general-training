@@ -254,3 +254,49 @@ stands.
 confirmed to match real elements on a section page, but no print preview
 was available in this environment, so the A4 result needs one look at
 Ctrl+P before you trust it.
+
+## Revision — product chrome and semantic marking colours
+
+You said the first build read like a blog rather than a product. That look
+was what section 6 of the brief asked for literally, so this reverses two
+of its rules on your instruction:
+
+**Green and red for marking.** `--mark-correct` and `--mark-incorrect` are
+now a green and a red rather than the accent and plain ink. Both meet
+WCAG AA against the page in both themes (5.0:1 and 6.5:1 light; 11.0:1 and
+6.9:1 dark), and the rule that colour is never the only signal is
+unchanged: every state still carries an icon and a word, and a wrong
+answer is still struck through. In print all of it collapses back to black.
+
+**Three layers instead of one.** `--layer-page`, `--layer-raised` and
+`--layer-strip` give an interactive surface a visible edge without putting
+a fill behind running text. The brief's "structure from rules and space"
+still holds for content: passages, tables and callouts are unchanged.
+Only the things a student acts on — exercise, stat tile, nav card — are
+panels.
+
+**What that bought, concretely**
+
+- The exercise is a card with a header strip (task name, question type,
+  question count, rubric, timer) and an action bar (Check / score / Try
+  again), instead of a run of text with a button after it.
+- Section pages carry a header: part, "Section 5 of 13", and a count of
+  reading texts, marked questions and timed minutes, all derived from the
+  blocks so they cannot drift.
+- An "On this page" list beside the content on wide screens.
+- The sidebar shows how many exercises in each part are done, and ticks
+  sections that have been attempted.
+- The progress page is three stat tiles plus the exercise list grouped by
+  part, rather than a flat list.
+- Landing page has a start button, live course figures and the teacher.
+
+**Accessibility re-checked after the redesign**, with axe-core on the
+section, home and progress pages, in both themes and at 360px: zero
+violations. Two real defects were found and fixed on the way — a callout
+marked up as `aside` put a false landmark inside `main`, and horizontally
+scrolling tables were unreachable by keyboard.
+
+**Heading levels corrected.** Section pages jumped `h1` → `h3`, because
+the content model numbers headings as the book does. The renderer now maps
+the book's level 3 and 4 onto the page's `h2` and `h3`, which is the
+correct outline once the section title is the page's `h1`.

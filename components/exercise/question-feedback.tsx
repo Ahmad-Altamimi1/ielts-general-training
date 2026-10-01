@@ -5,39 +5,59 @@ import type { QuestionResult, QuestionStatus } from "@/lib/marking";
 /**
  * Marking state never rests on colour.
  *
- * Each state carries an icon and a word as well, so that the score is
- * legible to a colour-blind student, in print, and to a screen reader.
- * Correct takes the accent; incorrect stays ink and is told apart by its
- * mark, its label and the struck-through response.
+ * Green and red carry the result at a glance, which is what a student
+ * scanning their own paper actually uses. Each state also carries an icon
+ * and a word, so a colour-blind student, a printed page and a screen
+ * reader all give the same answer. Both colours meet WCAG AA against the
+ * page in both themes; the washes sit behind nothing but the feedback
+ * block itself, never behind running text.
  */
 const STATES: Record<
   QuestionStatus,
-  { label: string; icon: typeof Check; className: string }
+  {
+    label: string;
+    icon: typeof Check;
+    text: string;
+    border: string;
+    wash: string;
+  }
 > = {
   correct: {
     label: "Correct",
     icon: Check,
-    className: "text-mark-correct border-mark-correct",
+    text: "text-mark-correct",
+    border: "border-mark-correct",
+    wash: "bg-mark-correct-wash",
   },
   incorrect: {
     label: "Incorrect",
     icon: X,
-    className: "text-mark-incorrect border-mark-incorrect",
+    text: "text-mark-incorrect",
+    border: "border-mark-incorrect",
+    wash: "bg-mark-incorrect-wash",
   },
   unanswered: {
     label: "Not answered",
     icon: Minus,
-    className: "text-mark-unanswered border-mark-unanswered",
+    text: "text-mark-unanswered",
+    border: "border-mark-unanswered",
+    wash: "bg-transparent",
   },
 };
 
-export function StatusMark({ status }: { status: QuestionStatus }) {
+export function StatusMark({
+  status,
+  className,
+}: {
+  status: QuestionStatus;
+  className?: string;
+}) {
   const state = STATES[status];
   const Icon = state.icon;
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${state.className}`}
+      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${state.text} ${className ?? ""}`}
     >
       <Icon aria-hidden="true" className="size-4 shrink-0" strokeWidth={2.5} />
       {state.label}
@@ -87,7 +107,7 @@ export function QuestionFeedback({ result }: { result: QuestionResult }) {
 
   return (
     <div
-      className={`mt-3 break-inside-avoid border-l-2 pl-3 ${state.className.split(" ")[1]}`}
+      className={`mt-3 break-inside-avoid rounded-sm border-l-2 ${state.border} ${state.wash} px-3.5 py-3`}
     >
       <StatusMark status={result.status} />
 
@@ -120,7 +140,7 @@ export function QuestionFeedback({ result }: { result: QuestionResult }) {
       </dl>
 
       {/* Shown for right answers too: it names the trap that was avoided. */}
-      <p className="mt-2 text-sm">{result.why}</p>
+      <p className="mt-2 border-t border-rule/60 pt-2 text-sm">{result.why}</p>
     </div>
   );
 }

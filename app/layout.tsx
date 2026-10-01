@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { COURSE } from "@/lib/course";
 
 const sans = Geist({
   variable: "--font-sans",
@@ -54,8 +55,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SidebarProvider>
             <AppSidebar />
 
-            <div className="flex min-h-svh w-full min-w-0 flex-col">
-              <header className="print-hidden sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-rule bg-background px-3 sm:px-4">
+            <div className="flex min-h-svh w-full min-w-0 flex-col bg-layer-page">
+              <header className="print-hidden sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-layer-border bg-layer-page/90 px-3 backdrop-blur-sm sm:px-6">
                 <SidebarTrigger />
                 <div className="ml-auto flex items-center gap-2">
                   <SearchDialog />
@@ -63,9 +64,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </div>
               </header>
 
-              <main id="main" className="min-w-0 flex-1 px-4 py-8 sm:px-8">
+              <main id="main" className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10">
                 {children}
               </main>
+
+              <footer className="print-hidden border-t border-layer-border px-4 py-6 text-sm text-ink-muted sm:px-6 lg:px-10">
+                <p className="mx-auto max-w-6xl">
+                  {COURSE.title} · {COURSE.level} · {COURSE.teacherRole}{" "}
+                  {COURSE.teacherName}
+                </p>
+              </footer>
             </div>
           </SidebarProvider>
         </ThemeProvider>
