@@ -57,3 +57,58 @@ hydration flag via `hooks/use-hydrated.ts`. Rule not disabled.
 
 **`shadcn` moved to `devDependencies`.** The CLI installs itself as a runtime
 dependency; it is a build-time tool and does not belong in the bundle graph.
+
+## Milestone 2 — content pipeline
+
+**CONFLICT WITH BRIEF — there is no `content.json`.** The brief says it
+would be supplied. What exists is the Word book,
+`IELTS-GT-Student-Book.docx`. Rather than hand-transcribe 90 pages — which
+would be writing course content, which the brief forbids — the book itself
+is the source of truth and `tools/` converts it:
+
+- `tools/docx/read-docx.ts` reads the .docx into a flat document model
+  (paragraph style, run formatting, table grid) and decides nothing.
+- `tools/docx/to-content.ts` interprets that model as content blocks.
+- `tools/build-content.ts` validates each part and writes `content/`.
+
+`npm run content` regenerates. Files under `content/` are generated, so the
+fix for a content error is to fix the book and re-run.
+
+**GAP IN THE BOOK — Appendix A is missing.** The book refers to "Appendix A"
+three times (How to Use This Book, Part 10, and the Practice Test 1 rubric)
+for the eight listening scripts. The .docx contains no Appendix A; the only
+appendix present is the answer keys. Not invented. Listening sections will
+render without their scripts until the appendix is supplied.
+
+**GAP IN THE BOOK — three parts have no `summary`.** Part summaries come
+from the printed Contents page, which supplies one for every numbered part
+but not for `how-to-use-this-book`, `appendix-answer-keys` or
+`a-final-note`. Reported by `npm run content` rather than filled in. Those
+three parts are not generated until a line is supplied for each.
+
+**DEVIATION FROM THE BRIEF'S MODEL — `Part.intro?: Block[]` added.** Most
+parts print prose under the part title before the first numbered section.
+The brief's `Part` has nowhere to put it, so the choice was to drop real
+content or to invent a section heading for it. Added an optional field
+instead. Nothing else in the model changed.
+
+**Section ids keep the book's printed number** — "1.1", "3.5", "b.4" — so
+that a student reading on paper and a student reading on screen are looking
+at the same label. Sections with no printed number are slugified from the
+title.
+
+**Single-cell tables are classified by shape**, because the book uses the
+same device for three things: a worked example ends in "Answer: X"; a
+reading passage is long and carries a bold title; anything else is a
+callout. A short, fully bold paragraph with no terminal punctuation is a
+fourth-level heading, which is how the book writes those rather than
+styling them as Heading4.
+
+**The printed cover and Contents page are not converted.** The app builds
+its own index from the content tree, so reproducing the printed one would
+be a second thing to keep in sync. The Contents page is still parsed, for
+the part summaries.
+
+**Inline markdown is parsed to React nodes** by a ~30-line hand-written
+parser, not a markdown library. The grammar is two rules wide and parsing
+to nodes keeps content away from `dangerouslySetInnerHTML` entirely.
