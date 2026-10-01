@@ -1,10 +1,11 @@
 import { BookOpen, ListChecks, MessageSquare, Timer } from "lucide-react";
 
-import { ContinueCard, type ResumePoint } from "@/components/home/continue-card";
 import { PartCard } from "@/components/home/part-card";
+import { BandPanel } from "@/components/study/band-panel";
+import { NextUp } from "@/components/study/next-up";
+import { WeakSpots } from "@/components/study/weak-spots";
 import { navTree } from "@/lib/content/nav";
-import { allExercises, partLabel, sectionHref } from "@/lib/content/registry";
-import { toneFor } from "@/lib/content/tone";
+import { allExercises } from "@/lib/content/registry";
 import { COURSE } from "@/lib/course";
 
 const PROMISE_ICONS = [ListChecks, BookOpen, Timer, MessageSquare] as const;
@@ -17,19 +18,6 @@ export default function HomePage() {
     0,
   );
   const sections = tree.reduce((n, part) => n + part.sections.length, 0);
-
-  const resume: ResumePoint[] = allExercises.map(
-    ({ part, section, exercise }) => ({
-      exerciseId: exercise.id,
-      exerciseTitle: exercise.title,
-      partLabel: partLabel(part),
-      partTitle: part.title,
-      sectionId: section.id,
-      sectionTitle: section.title,
-      href: `${sectionHref(part.id, section.id)}#${exercise.id}-title`,
-      tone: toneFor(part.id),
-    }),
-  );
 
   return (
     <div className="mx-auto w-full max-w-6xl pb-10">
@@ -69,8 +57,8 @@ export default function HomePage() {
             ))}
           </dl>
 
-          <div className="mt-8 max-w-xl">
-            <ContinueCard points={resume} />
+          <div className="mt-8">
+            <NextUp />
           </div>
 
           <p className="mt-8 flex items-center gap-3 border-t border-layer-border pt-5">
@@ -90,6 +78,12 @@ export default function HomePage() {
             </span>
           </p>
         </div>
+      </section>
+
+      {/* ---- Where the student stands -------------------------------- */}
+      <section className="mt-6 grid gap-3 lg:grid-cols-2" aria-label="Your standing">
+        <BandPanel />
+        <WeakSpots />
       </section>
 
       {/* ---- What it does -------------------------------------------- */}

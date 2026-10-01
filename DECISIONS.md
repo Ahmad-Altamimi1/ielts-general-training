@@ -351,3 +351,55 @@ axe-core on home, part, section and progress pages, light and dark, at
 360px and desktop — zero violations, no horizontal overflow. Marking
 still never depends on colour alone, and print still collapses every tone
 to black on white.
+
+## Revision 3 — a reason to keep going
+
+You said there was nothing that would make a student continue. That was
+right, and it was not a visual problem: a student finished an exercise,
+saw "6 / 8", and the app had nothing further to say. Marking was the end
+of the loop instead of the middle of it.
+
+The book already contains the answer and we were rendering it as inert
+prose. Section 1.2 prints the raw-score-to-band table, and the book's own
+argument about it is that the gap between band 5 and band 6 in Reading is
+seven answers — a distance small enough to work at this week.
+
+**The band projection.** `lib/band.ts` parses that table out of the
+generated content rather than copying it, so the two cannot disagree. A
+student's marked answers are projected over forty questions, mapped to a
+band, and shown with the one number that matters: how many more correct
+answers stand between them and the next band. Listening and Reading are
+kept apart, because the book's thresholds differ.
+
+It is labelled an estimate everywhere it appears, and it names the sample
+it came from ("from 7/14 marked here, not a real test score"). Overstating
+it would make the whole feature worthless.
+
+**Weak spots.** Accuracy per question type, weakest first, each linking to
+the unit that teaches its rule. The book is organised by question type and
+insists every type has one, so "33% on Matching" is a specific instruction
+rather than a vague score.
+
+**A streak.** Consecutive days of practice, counted back from today — and
+from yesterday when nothing has been done yet today, so that a streak does
+not appear to vanish the moment the student opens the page in the morning.
+That rule is tested.
+
+**No dead ends.** Every marked exercise now ends with the next one, and
+`NextUp` answers "what now?" in every state: the first exercise before
+anything is attempted, the first unmarked one after that, and the weakest
+question type once everything has been done once.
+
+`lib/study-stats.ts` is pure functions over the progress map and a flat
+list of exercise metadata, so all of it is tested without a browser —
+13 new tests covering the streak rules, the per-paper split, the
+weakest-first ordering, and the band projection against the book's real
+table (30 of 40 in GT Reading is band 6; four more reaches band 7).
+
+**`vitest.config.mts` now resolves the `@` alias**, so tests exercise the
+real module graph — including parsing the band scale out of the generated
+content, which is the thing most likely to break silently if the book's
+table changes shape.
+
+Re-audited with axe-core after the change: home, section and progress
+pages, both themes — zero violations.

@@ -6,7 +6,9 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchDialog } from "@/components/search/search-dialog";
+import { StudyProvider } from "@/components/study/study-context";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { exerciseMetas } from "@/lib/exercise-meta";
 import { COURSE } from "@/lib/course";
 
 const sans = Geist({
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           enableSystem
           disableTransitionOnChange
         >
+          <StudyProvider exercises={exerciseMetas()}>
           <SidebarProvider>
             <AppSidebar />
 
@@ -76,6 +79,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               </footer>
             </div>
           </SidebarProvider>
+          </StudyProvider>
         </ThemeProvider>
       </body>
     </html>

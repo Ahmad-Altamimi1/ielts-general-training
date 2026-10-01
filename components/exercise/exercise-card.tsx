@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ListChecks, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, ListChecks, RotateCcw } from "lucide-react";
 
 import { ExerciseTimer } from "@/components/exercise/exercise-timer";
+import { useNextExercise } from "@/components/study/study-context";
 import {
   PrintAnswer,
   QuestionFeedback,
@@ -33,6 +35,7 @@ const KIND_LABEL: Record<Exercise["kind"], string> = {
 
 export function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const saved = useExerciseProgress(exercise.id);
+  const next = useNextExercise(exercise.id);
   const [local, setLocal] = useState<Local>(null);
 
   // Derived rather than copied into state by an effect: on the server and
@@ -219,6 +222,30 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
           </>
         )}
         </div>
+
+        {result !== null && next ? (
+          <Link
+            href={next.href}
+            data-tone={next.tone}
+            className="group mt-3.5 flex items-center gap-3 rounded-lg border border-layer-border bg-layer-raised px-4 py-3 transition hover:border-tone"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="font-heading block text-[0.6875rem] font-bold tracking-wider text-tone uppercase">
+                Next
+              </span>
+              <span className="mt-0.5 block truncate text-sm font-medium">
+                {next.title}
+              </span>
+              <span className="block truncate text-xs text-ink-muted">
+                {next.partLabel} · {next.sectionId} {next.sectionTitle}
+              </span>
+            </span>
+            <ArrowRight
+              aria-hidden="true"
+              className="size-4 shrink-0 text-tone transition-transform group-hover:translate-x-0.5"
+            />
+          </Link>
+        ) : null}
       </footer>
 
       {/* The score reaches a screen reader as soon as marking happens,
