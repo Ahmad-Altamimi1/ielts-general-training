@@ -21,8 +21,11 @@ import type { DocNode, Para, Run, Table } from "./read-docx";
 import {
   buildExercise,
   collectAnswerKeys,
+  draftFromParagraph,
+  extractPanelExercise,
   questionNumber,
   type KeyIndex,
+  type QuestionDraft,
 } from "./exercises";
 import type {
   Block,
@@ -179,27 +182,32 @@ function classifyPanel(paras: Para[]): Panel {
   }
 
   if (title && whole.length >= PASSAGE_MIN_CHARS) {
+    // Built from the paragraphs themselves, not from `body`, because the
+    // paragraph letter is separated by whitespace that tidying removes.
+    const bodyParas = title && paras.length > 1 ? paras.slice(1) : paras;
     return {
       kind: "passage",
       title,
-      paragraphs: splitPassage(body),
+      paragraphs: bodyParas
+        .map(passageParagraph)
+        .filter((p) => p.text !== ""),
     };
   }
 
   return { kind: "callout", ...(title ? { title } : {}), body };
 }
 
-const LETTERED = /^([A-H])\s{2,}(.+)$/;
+/** The exam separates a paragraph's letter from its text by a tab or a
+ *  run of spaces. It has to be read before whitespace is collapsed, or
+ *  "A  When governments…" is indistinguishable from a sentence that
+ *  happens to begin with the article "a". */
+const LETTERED = /^\s*([A-H])(?:\t| |\s{2,})\s*([\s\S]+)$/;
 
-/** Recovers lettered paragraphs ("A  Some text") the exam prints so that
- *  questions can refer back to them. */
-function splitPassage(texts: string[]): Paragraph[] {
-  return texts.map((text) => {
-    const match = LETTERED.exec(text);
-    return match
-      ? { label: match[1], text: tidy(match[2]) }
-      : { text };
-  });
+function passageParagraph(para: Para): Paragraph {
+  const match = LETTERED.exec(para.text);
+  return match
+    ? { label: match[1], text: tidy(match[2]) }
+    : { text: paraText(para) };
 }
 
 /* -- tables ------------------------------------------------------------ */
@@ -366,12 +374,16 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
       return;
     }
 
+    const drafts = questionParas
+      .map(draftFromParagraph)
+      .filter((d): d is QuestionDraft => d !== null);
+
     const result = buildExercise({
       sectionId: section.id,
       ordinal: acc.exerciseCount,
       title,
       instruction,
-      questionParas,
+      drafts,
       keys: keyIndex.get(section.id),
     });
 
@@ -409,6 +421,50 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
     flushQuestions();
     flushList(acc);
     acc.blocks.push(block);
+  };
+
+  /**
+   * A panel that reproduces an exam page — a form to complete, a set of
+   * notes, a block of multiple-choice questions — becomes an exercise
+   * rather than a quotation of one.
+   *
+   * The panel's own title is kept as a heading above it, because it is
+   * the form's or the talk's name and the questions read oddly without
+   * it. Returns false when the panel is not a question set.
+   */
+  const pushPanelExercise = (cell: Para[]): boolean => {
+    if (!section) return false;
+
+    const panel = extractPanelExercise(cell);
+    if (!panel) return false;
+
+    const keys = keyIndex.get(section.id);
+    if (!keys || keys.size === 0) return false;
+
+    const result = buildExercise({
+      sectionId: section.id,
+      ordinal: acc.exerciseCount,
+      title:
+        panel.label ??
+        exerciseTitle(acc.headings, panel.instruction, section.title),
+      instruction: panel.instruction,
+      drafts: panel.questions,
+      options: panel.options,
+      keys,
+    });
+
+    if (!result.ok) {
+      warnings.push(result.warning);
+      return false;
+    }
+
+    const title = leadingBoldTitle(cell);
+    if (title) push({ kind: "heading", level: 4, text: title });
+
+    push({ kind: "exercise", exercise: result.exercise });
+    warnings.push(...result.warnings);
+    acc.exerciseCount += 1;
+    return true;
   };
 
   /**
@@ -460,6 +516,8 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
       for (const row of node.rows) {
         const cell = row[0];
         if (!cell || cellText(cell) === "") continue;
+
+        if (pushPanelExercise(cell)) continue;
 
         const panel = classifyPanel(cell);
         if (panel.kind === "callout" && attachOptions(panel)) continue;

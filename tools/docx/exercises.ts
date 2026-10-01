@@ -173,11 +173,165 @@ export function isQuestion(node: DocNode): boolean {
 }
 
 /** The prompt is everything after the number. */
-function questionPrompt(para: Para): string {
-  return tidy(para.runs.slice(1).map((r) => r.text).join(""));
+export function draftFromParagraph(para: Para): QuestionDraft | null {
+  const n = questionNumber(para);
+  if (n === null) return null;
+  const prompt = tidy(para.runs.slice(1).map((r) => r.text).join(""));
+  return prompt === "" ? null : { n, prompt };
 }
 
 const MCQ_CHOICE = /^([A-H])[.)]?\s+(.+)$/;
+
+/* -- reading the questions out of a panel ------------------------------ *
+ * The book writes questions three ways. Numbered paragraphs are one (see
+ * above). The other two live inside a bordered panel that reproduces the
+ * exam page:
+ *
+ *   a form or set of notes   "Caller's family name:  1  .........."
+ *   multiple choice          "11 The library is open until 10pm"
+ *                            "A every day of the week."
+ *
+ * In both the number is plain text in the middle of a line, so the accent
+ * colour is no help and the shape of the line has to be read instead.
+ * ---------------------------------------------------------------------- */
+
+/** A numbered gap: the question number followed by a printed rule. */
+const GAP = /(?:^|\s)(\d{1,2})\s+\.{4,}/g;
+const NUMBERED_LINE = /^(\d{1,2})[.)]?\s+(.+)$/;
+const RUBRIC =
+  /\b(complete the|choose the correct|write no more than|write the correct|write true|write yes|label the|which paragraph|answer the questions|choose from the list|there are more|match each|match the|look at the following|using words from)\b/i;
+
+/** "Questions 6 to 10", the label the exam prints above a set. */
+const SET_LABEL = /^Questions?\s+\d+\s+(?:to|[-–])\s+\d+\.?$/i;
+
+/** A word box: the shortlist a summary-completion task is filled from. */
+const BOX = /^BOX\s*:\s*(.*)$/i;
+
+export type QuestionDraft = {
+  n: number;
+  prompt: string;
+  choices?: { id: string; text: string }[];
+};
+
+export type PanelExercise = {
+  instruction: string;
+  questions: QuestionDraft[];
+  /** A shared option list printed above the questions, as a matching task
+   *  prints "A It is well written and needs no change.", or the word box
+   *  a summary-completion task is filled from. */
+  options?: string[];
+  /** "Questions 6 to 10", when the exam prints that label. */
+  label?: string;
+};
+
+/** The printed rule a student writes on becomes an ellipsis, so the prompt
+ *  reads as a sentence with a gap in it. */
+function markGaps(text: string): string {
+  return tidy(text.replace(/\.{4,}/g, " …"));
+}
+
+/**
+ * Reads an exam-page panel as a set of questions.
+ *
+ * Returns null when the panel is not one — a callout, a passage, a worked
+ * example — which is most of them.
+ */
+export function extractPanelExercise(paras: Para[]): PanelExercise | null {
+  const instruction: string[] = [];
+  const questions: QuestionDraft[] = [];
+  const sharedOptions: string[] = [];
+  const box: string[] = [];
+  let label: string | undefined;
+  let inBox = false;
+  let current: QuestionDraft | null = null;
+
+  for (const para of paras) {
+    const text = tidy(para.text);
+    if (text === "") continue;
+
+    // The word box runs on over several lines until the next rubric or
+    // question, and the task cannot be answered without it.
+    const boxStart = BOX.exec(text);
+    if (boxStart) {
+      inBox = true;
+      box.push(boxStart[1]);
+      current = null;
+      continue;
+    }
+    if (inBox) {
+      if (RUBRIC.test(text) || NUMBERED_LINE.test(text) || SET_LABEL.test(text)) {
+        inBox = false;
+      } else {
+        box.push(text);
+        continue;
+      }
+    }
+
+    if (SET_LABEL.test(text)) {
+      label ??= text.replace(/\.$/, "");
+      current = null;
+      continue;
+    }
+
+    const choice = MCQ_CHOICE.exec(text);
+    if (choice && !NUMBERED_LINE.test(text)) {
+      if (current) {
+        // An option line under a question belongs to that question.
+        (current.choices ??= []).push({ id: choice[1], text: tidy(choice[2]) });
+      } else if (questions.length === 0) {
+        // An option line before any question is the shared list that a
+        // matching task is answered from.
+        sharedOptions.push(text);
+      }
+      continue;
+    }
+
+    const gaps = [...text.matchAll(GAP)];
+    if (gaps.length > 0) {
+      // The whole line is the prompt, so the student can see where the
+      // answer goes and what sits either side of it.
+      const prompt = markGaps(text.replace(GAP, " …"));
+      for (const gap of gaps) {
+        current = { n: Number(gap[1]), prompt };
+        questions.push(current);
+      }
+      continue;
+    }
+
+    if (RUBRIC.test(text)) {
+      instruction.push(text);
+      current = null;
+      continue;
+    }
+
+    const numbered = NUMBERED_LINE.exec(text);
+    if (numbered) {
+      current = { n: Number(numbered[1]), prompt: markGaps(numbered[2]) };
+      questions.push(current);
+      continue;
+    }
+
+    // A heading, a caption, or the panel's own title.
+    current = null;
+  }
+
+  if (questions.length === 0 || instruction.length === 0) return null;
+
+  const boxWords = box.join(" ").split(/\s+/).filter((w) => w !== "");
+  const options =
+    sharedOptions.length >= 2
+      ? sharedOptions
+      : boxWords.length >= 2
+        ? boxWords
+        : undefined;
+
+  return {
+    instruction: instruction.join(" "),
+    questions,
+    ...(options ? { options } : {}),
+    ...(label ? { label } : {}),
+  };
+}
 
 /* -- the rubric -------------------------------------------------------- */
 
@@ -255,7 +409,8 @@ export type BuildInput = {
   ordinal: number;
   title: string;
   instruction: string;
-  questionParas: Para[];
+  /** Questions already read out of whichever shape the book used. */
+  drafts: QuestionDraft[];
   options?: string[];
   keys: Map<number, AnswerKey> | undefined;
 };
@@ -265,7 +420,7 @@ export type BuildResult =
   | { ok: false; warning: string };
 
 export function buildExercise(input: BuildInput): BuildResult {
-  const { sectionId, ordinal, title, instruction, questionParas, keys } = input;
+  const { sectionId, ordinal, title, instruction, drafts, keys } = input;
 
   const id = ordinal === 0 ? `ex-${sectionId}` : `ex-${sectionId}-${ordinal + 1}`;
 
@@ -280,35 +435,39 @@ export function buildExercise(input: BuildInput): BuildResult {
   const missing: number[] = [];
   const unexplained: number[] = [];
 
-  for (const para of questionParas) {
-    const n = questionNumber(para);
-    if (n === null) continue;
-
-    const key = keys.get(n);
+  for (const draft of drafts) {
+    const key = keys.get(draft.n);
     if (!key) {
-      missing.push(n);
+      missing.push(draft.n);
       continue;
     }
+    // `why` is the point of the whole exercise and is never invented, so
+    // a question the appendix does not explain is left out of the set.
     if (key.why.trim() === "") {
-      unexplained.push(n);
+      unexplained.push(draft.n);
       continue;
     }
-
-    const prompt = questionPrompt(para);
-    if (prompt === "") continue;
+    if (draft.prompt === "") continue;
 
     questions.push({
-      n,
-      prompt,
+      n: draft.n,
+      prompt: draft.prompt,
       answers: key.answers,
       why: key.why,
+      ...(draft.choices && draft.choices.length >= 2
+        ? { choices: draft.choices }
+        : {}),
     });
   }
 
   if (questions.length === 0) {
+    const reason =
+      unexplained.length > 0
+        ? `the appendix prints keys but no explanations for question(s) ${unexplained.join(", ")}, and \`why\` is required`
+        : `no question could be paired with a key`;
     return {
       ok: false,
-      warning: `${id} ("${title}"): no question could be paired with a key. Questions left as prose.`,
+      warning: `${id} ("${title}"): ${reason}. Questions left as prose.`,
     };
   }
 
@@ -324,7 +483,10 @@ export function buildExercise(input: BuildInput): BuildResult {
     );
   }
 
-  const kind = kindFrom(instruction, false);
+  const kind = kindFrom(
+    instruction,
+    questions.some((q) => q.choices !== undefined),
+  );
   const timeLimitSeconds = timeLimitFrom(instruction);
   const options =
     input.options ??

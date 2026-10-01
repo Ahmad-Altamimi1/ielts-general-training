@@ -214,3 +214,43 @@ copying storage into state.
 
 **Dates are formatted in a fixed `en-GB`/UTC format**, so the server
 render and the browser's own locale cannot disagree.
+
+## Milestone 6 — print and the full book
+
+**Print shows every answer and explanation**, marked or not. On screen a
+student who has not checked yet must not see the answer, so the block is
+in the DOM but hidden, and the print stylesheet reveals it. The sheet is
+no use to a teacher without the key.
+
+**The book writes questions three ways**, and the converter reads all
+three: numbered paragraphs (the number is a bold run in the accent
+colour); a form or set of notes with a numbered rule in mid-line; and a
+panel of multiple choice with its options under each question. A fourth
+device, the word box of a summary-completion task, is captured as the
+exercise's options — without it the task cannot be answered at all.
+
+**Paragraph letters are read before whitespace is collapsed.** The exam
+separates "A" from its paragraph by two spaces, and once those are
+collapsed "A When governments…" is indistinguishable from a sentence
+beginning with the article. Same class of bug as the Contents page.
+
+### Gaps in the book, reported and not filled in
+
+| Gap | Effect |
+| --- | --- |
+| Appendix A (eight listening scripts) is absent | Listening units have no scripts |
+| No Contents summary for three parts | Those three parts are not generated |
+| Appendix B.7 gives keys but no explanations | Section 10.2's ten questions are not markable |
+| Practice Test 1 has no key | Its 40 questions render as an exam paper, not an exercise |
+
+The last of those is the book's own decision and is stated in it; the
+first three are things the book is missing. Nothing was invented to cover
+any of them.
+
+**12 exercises, 70 markable questions** are extracted from the book as it
+stands.
+
+**Print output could not be verified from here.** The selectors are
+confirmed to match real elements on a section page, but no print preview
+was available in this environment, so the A4 result needs one look at
+Ctrl+P before you trust it.

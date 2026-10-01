@@ -3,7 +3,10 @@
 import { useState } from "react";
 
 import { ExerciseTimer } from "@/components/exercise/exercise-timer";
-import { QuestionFeedback } from "@/components/exercise/question-feedback";
+import {
+  PrintAnswer,
+  QuestionFeedback,
+} from "@/components/exercise/question-feedback";
 import { QuestionInput } from "@/components/exercise/question-input";
 import { Button } from "@/components/ui/button";
 import { useExerciseProgress } from "@/hooks/use-progress";
@@ -63,7 +66,7 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
   return (
     <section
       aria-labelledby={`${exercise.id}-title`}
-      className="mt-10 border-t-2 border-rule-strong pt-5"
+      className="mt-10 break-inside-avoid border-t-2 border-rule-strong pt-5"
     >
       <div className="measure">
         <h4
@@ -121,7 +124,9 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
 
                 {questionResult ? (
                   <QuestionFeedback result={questionResult} />
-                ) : null}
+                ) : (
+                  <PrintAnswer answers={question.answers} why={question.why} />
+                )}
               </div>
             </li>
           );

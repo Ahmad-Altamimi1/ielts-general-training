@@ -194,6 +194,111 @@
   }
 }
 
+/* ===================================================================== *
+ * Print
+ *
+ * The teacher will still photocopy parts of this. A printed page is
+ * black on white, carries no navigation and no controls, shows every
+ * answer and explanation whether or not the set was marked on screen,
+ * and does not cut a passage, a table or a question in half.
+ * ===================================================================== */
+
+@media print {
+  /* Ink on paper regardless of the theme on screen. */
+  :root,
+  .dark {
+    color-scheme: light;
+    --paper: #ffffff;
+    --ink: #000000;
+    --ink-muted: #333333;
+    --brand: #000000;
+    --brand-ink: #ffffff;
+    --rule: #999999;
+    --rule-strong: #000000;
+    --surface-muted: #ffffff;
+    --surface-hover: #ffffff;
+    --timer-overrun: #000000;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  /* Navigation, controls and anything else that cannot be used on paper. */
+  .print-hidden,
+  [data-slot="sidebar"],
+  [data-slot="sidebar-wrapper"] > [data-slot="sidebar"],
+  [data-slot="sidebar-rail"],
+  [data-slot="sidebar-trigger"],
+  header[class*="sticky"],
+  button,
+  input,
+  select,
+  [role="combobox"],
+  [data-slot="select-trigger"],
+  [data-slot="radio-group"] {
+    display: none !important;
+  }
+
+  /* The sidebar leaves a reserved gap; reclaim the full measure. */
+  [data-slot="sidebar-wrapper"],
+  [data-slot="sidebar-gap"],
+  [data-slot="sidebar-inset"] {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main {
+    padding: 0 !important;
+  }
+
+  /* Paper is narrower than the screen measure, and the page margin already
+     does the work of capping the line length. */
+  .measure,
+  .measure-narrow {
+    max-width: none;
+  }
+
+  /* Nothing the student needs to read as one piece may be split. */
+  figure,
+  table,
+  thead,
+  .break-inside-avoid,
+  [data-print-keep] {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Answers and explanations are printed for every question, marked or
+     not, because the sheet is no use to a teacher without them. */
+  [data-print-answer] {
+    display: block !important;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+}
+
 @layer utilities {
   /* Caps the line length of body copy at a readable measure. */
   .measure {

@@ -45,6 +45,43 @@ export function StatusMark({ status }: { status: QuestionStatus }) {
   );
 }
 
+/**
+ * The answer and its explanation, on paper only.
+ *
+ * On screen a student who has not checked yet should not see the answer.
+ * On paper the sheet is no use to a teacher without it, so this is hidden
+ * by default and revealed by the print stylesheet.
+ */
+export function PrintAnswer({
+  answers,
+  why,
+}: {
+  answers: readonly string[];
+  why: string;
+}) {
+  const [expected, ...alsoAccepted] = answers;
+
+  return (
+    <div
+      data-print-answer
+      aria-hidden="true"
+      className="mt-3 hidden break-inside-avoid border-l-2 border-rule pl-3 text-sm"
+    >
+      <p>
+        <span className="text-ink-muted">Answer </span>
+        <span className="font-semibold">{expected}</span>
+        {alsoAccepted.length > 0 ? (
+          <span className="text-ink-muted">
+            {" "}
+            (also accepted: {alsoAccepted.join(", ")})
+          </span>
+        ) : null}
+      </p>
+      <p className="mt-1">{why}</p>
+    </div>
+  );
+}
+
 export function QuestionFeedback({ result }: { result: QuestionResult }) {
   const state = STATES[result.status];
 

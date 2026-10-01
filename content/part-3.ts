@@ -238,25 +238,29 @@ const part: Part = {
           "title": "Evening courses at Al Waha Community Centre",
           "paragraphs": [
             {
-              "text": "A Beginner Photography"
+              "label": "A",
+              "text": "Beginner Photography"
             },
             {
               "text": "Every Tuesday, 6.00pm to 8.00pm, for six weeks. Bring your own camera; phone cameras are welcome. No previous experience is required. Fee: AED 300, payable on the first evening."
             },
             {
-              "text": "B Conversational English"
+              "label": "B",
+              "text": "Conversational English"
             },
             {
               "text": "A ten-week course for adults who can already read English but feel nervous when speaking. Sundays and Wednesdays, 7.00pm to 8.30pm. Places are limited to twelve people. Fee: AED 550, which must be paid in full before the course begins."
             },
             {
-              "text": "C Car Maintenance Basics"
+              "label": "C",
+              "text": "Car Maintenance Basics"
             },
             {
               "text": "Four Saturday morning sessions, 9.00am to 12.00pm, in the centre workshop. Participants must wear closed shoes for safety reasons. Fee: AED 200."
             },
             {
-              "text": "D Creative Writing"
+              "label": "D",
+              "text": "Creative Writing"
             },
             {
               "text": "An eight-week evening course on Mondays, 6.30pm to 8.00pm. Suitable for anyone who enjoys reading. Members of the centre pay AED 250; non-members pay AED 400. Laptops are available to borrow during class."
@@ -828,22 +832,28 @@ const part: Part = {
           "title": "Why cities are planting trees again",
           "paragraphs": [
             {
-              "text": "A For most of the twentieth century, the tree was treated by city planners as decoration. Roads were widened, car parks were laid, and where a tree stood in the way of either, the tree was removed. In some European and North American cities, the number of street trees fell by more than a third between 1950 and 1990. Trees were seen as expensive to maintain, a hazard in storms, and an obstacle to traffic."
+              "label": "A",
+              "text": "For most of the twentieth century, the tree was treated by city planners as decoration. Roads were widened, car parks were laid, and where a tree stood in the way of either, the tree was removed. In some European and North American cities, the number of street trees fell by more than a third between 1950 and 1990. Trees were seen as expensive to maintain, a hazard in storms, and an obstacle to traffic."
             },
             {
-              "text": "B That view has now reversed almost completely. City governments from Melbourne to Manchester have set targets to increase the share of land covered by tree canopy, and several have committed to planting a million trees or more. The change is not driven by beauty. It is driven by measurements, and above all by temperature. A street lined with mature trees can be several degrees cooler than an identical street without them, because leaves block sunlight before it reaches the road surface and because water evaporating from the leaves cools the surrounding air."
+              "label": "B",
+              "text": "That view has now reversed almost completely. City governments from Melbourne to Manchester have set targets to increase the share of land covered by tree canopy, and several have committed to planting a million trees or more. The change is not driven by beauty. It is driven by measurements, and above all by temperature. A street lined with mature trees can be several degrees cooler than an identical street without them, because leaves block sunlight before it reaches the road surface and because water evaporating from the leaves cools the surrounding air."
             },
             {
-              "text": "C The health evidence has strengthened the case. Studies in several countries have found lower rates of heat-related illness in greener neighbourhoods, and hospitals with a view of trees have reported shorter recovery times for some patients. Researchers are careful here: greener neighbourhoods are often wealthier ones, and wealth itself affects health, so separating the two is difficult. Even so, the direction of the evidence has been consistent enough for public health departments to begin treating tree cover as a health measure rather than an aesthetic one."
+              "label": "C",
+              "text": "The health evidence has strengthened the case. Studies in several countries have found lower rates of heat-related illness in greener neighbourhoods, and hospitals with a view of trees have reported shorter recovery times for some patients. Researchers are careful here: greener neighbourhoods are often wealthier ones, and wealth itself affects health, so separating the two is difficult. Even so, the direction of the evidence has been consistent enough for public health departments to begin treating tree cover as a health measure rather than an aesthetic one."
             },
             {
-              "text": "D Trees also do quiet work on water. In heavy rain, a mature tree intercepts a surprising volume of water on its leaves and bark, and its roots open channels in the soil that let the rest drain away slowly. Cities that have replaced hard drainage systems with what engineers call green infrastructure report fewer flash floods in the streets concerned. This matters more each year, as rainfall in many regions arrives in shorter and heavier bursts than it once did."
+              "label": "D",
+              "text": "Trees also do quiet work on water. In heavy rain, a mature tree intercepts a surprising volume of water on its leaves and bark, and its roots open channels in the soil that let the rest drain away slowly. Cities that have replaced hard drainage systems with what engineers call green infrastructure report fewer flash floods in the streets concerned. This matters more each year, as rainfall in many regions arrives in shorter and heavier bursts than it once did."
             },
             {
-              "text": "E None of this makes planting straightforward. A tree in a city lives a hard life: its roots are confined under pavement, its soil is compacted, and it is exposed to salt, pollution and mechanical damage. A large proportion of newly planted street trees die within five years, and the ones that survive rarely reach the size of a tree in open ground. The cost of planting is a fraction of the cost of keeping the tree alive, and planting campaigns that celebrate the number of trees put in the ground, without funding the watering and pruning that follow, tend to produce disappointing results."
+              "label": "E",
+              "text": "None of this makes planting straightforward. A tree in a city lives a hard life: its roots are confined under pavement, its soil is compacted, and it is exposed to salt, pollution and mechanical damage. A large proportion of newly planted street trees die within five years, and the ones that survive rarely reach the size of a tree in open ground. The cost of planting is a fraction of the cost of keeping the tree alive, and planting campaigns that celebrate the number of trees put in the ground, without funding the watering and pruning that follow, tend to produce disappointing results."
             },
             {
-              "text": "F The most successful programmes have therefore changed what they count. Instead of counting trees planted, they count canopy cover in ten years' time, and they allocate a maintenance budget for every tree from the beginning. Some cities have also moved away from planting a single fashionable species along a whole street, a practice that produced striking avenues in the past but left them vulnerable to a single disease. Variety, it turns out, is cheaper than replacement."
+              "label": "F",
+              "text": "The most successful programmes have therefore changed what they count. Instead of counting trees planted, they count canopy cover in ten years' time, and they allocate a maintenance budget for every tree from the beginning. Some cities have also moved away from planting a single fashionable species along a whole street, a practice that produced striking avenues in the past but left them vulnerable to a single disease. Variety, it turns out, is cheaper than replacement."
             }
           ]
         },
