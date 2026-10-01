@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Blocks } from "@/components/content/block-renderer";
+import { Breadcrumbs } from "@/components/nav/breadcrumbs";
 import {
   getPart,
   partLabel,
@@ -25,7 +26,11 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
 
   return (
     <article>
-      <header>
+      <Breadcrumbs
+        trail={[{ label: "Course", href: "/" }, { label: partLabel(part) }]}
+      />
+
+      <header className="mt-4">
         {part.number === null ? null : (
           <p className="font-heading text-sm font-semibold tracking-wide text-brand uppercase">
             Part {part.number}

@@ -1,4 +1,6 @@
 import Link from "next/link";
+
+import { SidebarNav } from "@/components/nav/sidebar-nav";
 import {
   Sidebar,
   SidebarContent,
@@ -6,14 +8,13 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { navTree } from "@/lib/content/nav";
 
-/**
- * The course navigation. Milestone 3 builds the tree from the content
- * index; until then this is the shell only.
- */
 export function AppSidebar() {
+  const tree = navTree();
+
   return (
-    <Sidebar>
+    <Sidebar className="print-hidden">
       <SidebarHeader className="border-b border-rule px-4 py-3">
         <Link
           href="/"
@@ -23,7 +24,9 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="px-2 py-3" />
+      <SidebarContent className="px-2 py-3">
+        <SidebarNav tree={tree} />
+      </SidebarContent>
 
       <SidebarFooter className="border-t border-rule px-4 py-3">
         <Link

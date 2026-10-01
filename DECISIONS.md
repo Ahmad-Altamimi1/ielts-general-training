@@ -112,3 +112,30 @@ the part summaries.
 **Inline markdown is parsed to React nodes** by a ~30-line hand-written
 parser, not a markdown library. The grammar is two rules wide and parsing
 to nodes keeps content away from `dangerouslySetInnerHTML` entirely.
+
+## Milestone 3 — navigation and search
+
+**The search index is written by `npm run content`**, not by a separate
+step, so it cannot drift from the content it indexes. It lands at
+`public/search-index.json`, is fetched once on the first Cmd+K (or on
+hover of the search button), and the dialog degrades to a plain message
+pointing at the sidebar if the fetch fails.
+
+**Ranking is a 20-line function, not a library.** Every query word must
+appear somewhere, a title match outranks a body match, and an exact title
+substring wins outright. No fuzzy matching, for the same reason the marking
+engine refuses it. Section text is capped at 1200 characters per section to
+keep the file small.
+
+**`cmdk`'s own filtering is switched off** (`shouldFilter={false}` on
+`Command`) because the ranking above is ours. Note that this CLI's
+`CommandDialog` does not wrap its children in `Command`, unlike older
+shadcn versions, so the command root is supplied in our own component.
+
+**Breadcrumb separators are siblings of breadcrumb items.** The obvious
+composition — separator inside the item — nests `<li>` inside `<li>`, which
+is invalid HTML and failed hydration. Caught in the browser, not by the
+build.
+
+**The sidebar drawer closes on navigation on mobile**, since otherwise the
+drawer covers the page the student just chose.

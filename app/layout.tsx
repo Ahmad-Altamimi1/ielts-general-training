@@ -5,6 +5,7 @@ import "./globals.css";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SearchDialog } from "@/components/search/search-dialog";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const sans = Geist({
@@ -56,7 +57,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <div className="flex min-h-svh w-full min-w-0 flex-col">
               <header className="print-hidden sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-rule bg-background px-3 sm:px-4">
                 <SidebarTrigger />
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-2">
+                  <SearchDialog />
                   <ThemeToggle />
                 </div>
               </header>

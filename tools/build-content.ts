@@ -14,10 +14,12 @@ import process from "node:process";
 
 import { readDocx } from "./docx/read-docx";
 import { docxToParts, type DraftPart } from "./docx/to-content";
-import { partSchema } from "../lib/content/schema";
+import { partSchema, type Block } from "../lib/content/schema";
+import { SEARCH_INDEX_PATH, type SearchEntry } from "../lib/search/types";
 
 const DEFAULT_DOCX = "C:\\Users\\ASUS\\Downloads\\IELTS-GT-Student-Book.docx";
 const CONTENT_DIR = join(process.cwd(), "content");
+const PUBLIC_DIR = join(process.cwd(), "public");
 
 const GENERATED_HEADER = `// Generated from the Word book by \`npm run content\`. Do not edit by hand:
 // change the book and re-run, or your edit is lost on the next build.
@@ -53,6 +55,53 @@ export const parts: Part[] = [
 ${list}
 ];
 `;
+}
+
+/** The searchable text of a block, in reading order. */
+function blockText(block: Block): string[] {
+  switch (block.kind) {
+    case "prose":
+      return [block.md.replace(/[*\\]/g, "")];
+    case "heading":
+      return [block.text];
+    case "list":
+      return block.items.map((i) => i.replace(/[*\\]/g, ""));
+    case "callout":
+      return [block.title ?? "", ...block.body];
+    case "table":
+      return [...block.headers, ...block.rows.flat()];
+    case "passage":
+      return [block.title ?? "", ...block.paragraphs.map((p) => p.text)];
+    case "worked":
+      return [block.question, ...block.steps];
+    case "exercise":
+      return [
+        block.exercise.title,
+        block.exercise.instruction,
+        ...block.exercise.questions.map((q) => q.prompt),
+      ];
+  }
+}
+
+/** Keeps the index small enough to fetch on the first Cmd+K and no larger. */
+const MAX_TEXT_PER_SECTION = 1200;
+
+function buildSearchIndex(parts: DraftPart[]): SearchEntry[] {
+  return parts.flatMap((part) =>
+    part.sections.map((section) => ({
+      href: `/${part.id}/${encodeURIComponent(section.id)}`,
+      partLabel: part.number === null ? part.title : `Part ${part.number}`,
+      sectionId: section.id,
+      sectionTitle: section.title,
+      text: section.blocks
+        .flatMap(blockText)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, MAX_TEXT_PER_SECTION)
+        .toLowerCase(),
+    })),
+  );
 }
 
 function main(): void {
@@ -98,6 +147,14 @@ function main(): void {
   }
   writeFileSync(join(CONTENT_DIR, "index.ts"), emitIndex(valid), "utf8");
 
+  mkdirSync(PUBLIC_DIR, { recursive: true });
+  const index = buildSearchIndex(valid);
+  writeFileSync(
+    join(PUBLIC_DIR, SEARCH_INDEX_PATH.replace(/^\//, "")),
+    JSON.stringify(index),
+    "utf8",
+  );
+
   for (const part of valid) {
     const sections = part.sections.length;
     const blocks =
@@ -107,6 +164,10 @@ function main(): void {
       `  wrote content/${moduleName(part)}.ts  ${sections} sections, ${blocks} blocks`,
     );
   }
+
+  console.log(
+    `  wrote public${SEARCH_INDEX_PATH}  ${index.length} sections indexed`,
+  );
 
   if (warnings.length > 0) {
     console.log(`\nGaps in the book (not filled in, as instructed):`);
