@@ -6,26 +6,56 @@ import { ExerciseTimer } from "@/components/exercise/exercise-timer";
 import { QuestionFeedback } from "@/components/exercise/question-feedback";
 import { QuestionInput } from "@/components/exercise/question-input";
 import { Button } from "@/components/ui/button";
+import { useExerciseProgress } from "@/hooks/use-progress";
 import type { Exercise } from "@/lib/content/schema";
-import { markExercise, type ExerciseResult } from "@/lib/marking";
+import { markExercise } from "@/lib/marking";
+import { clearExercise, saveProgress } from "@/lib/progress";
+
+type Responses = Record<number, string>;
+
+/** What the student has done here in this sitting. Null until they touch
+ *  the exercise, so that a saved attempt shows through until then. */
+type Local = { responses: Responses; marked: boolean } | null;
 
 export function ExerciseCard({ exercise }: { exercise: Exercise }) {
-  const [responses, setResponses] = useState<Record<number, string>>({});
-  const [result, setResult] = useState<ExerciseResult | null>(null);
+  const saved = useExerciseProgress(exercise.id);
+  const [local, setLocal] = useState<Local>(null);
 
-  const answer = (n: number, value: string) => {
-    setResponses((current) => ({ ...current, [n]: value }));
+  // Derived rather than copied into state by an effect: on the server and
+  // during hydration `saved` is null and this is the empty form, and the
+  // restored attempt appears in the same commit that reads storage.
+  const state = local ?? {
+    responses: saved?.responses ?? {},
+    marked: saved !== null,
   };
 
-  const check = () => setResult(markExercise(exercise, responses));
+  const result = state.marked ? markExercise(exercise, state.responses) : null;
+
+  const answer = (n: number, value: string) => {
+    setLocal({
+      marked: false,
+      responses: { ...state.responses, [n]: value },
+    });
+  };
+
+  const check = () => {
+    const marked = markExercise(exercise, state.responses);
+    setLocal({ responses: state.responses, marked: true });
+    saveProgress({
+      exerciseId: exercise.id,
+      responses: state.responses,
+      score: marked.score,
+      total: marked.total,
+    });
+  };
 
   const reset = () => {
-    setResponses({});
-    setResult(null);
+    setLocal({ responses: {}, marked: false });
+    clearExercise(exercise.id);
   };
 
   const answered = exercise.questions.filter(
-    (q) => (responses[q.n] ?? "").trim() !== "",
+    (q) => (state.responses[q.n] ?? "").trim() !== "",
   ).length;
 
   const byNumber = new Map(result?.results.map((r) => [r.n, r]) ?? []);
@@ -84,7 +114,7 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
                 <QuestionInput
                   exercise={exercise}
                   question={question}
-                  value={responses[question.n] ?? ""}
+                  value={state.responses[question.n] ?? ""}
                   onChange={(value) => answer(question.n, value)}
                   disabled={result !== null}
                 />

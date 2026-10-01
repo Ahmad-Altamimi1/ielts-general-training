@@ -186,3 +186,31 @@ the figure, so it is never the only signal. It never submits.
 headings exercise is one of the options offered.** This caught a real bug:
 the rubric parser read "A, B, C or D" as three options and dropped D,
 while the key accepted it.
+
+## Milestone 5 — progress
+
+**Progress is read through `useSyncExternalStore`, not an effect.** The
+server and the hydration pass see an empty record, the browser's real
+record arrives in the same commit that reads it, and there is no
+`setState` inside an effect for Next 16's lint to reject. A `storage`
+event listener means a second tab's work shows up in this one.
+
+**Stored records are validated with zod on every read.** localStorage can
+hold anything — a record written by an older version, or edited by hand.
+Anything that does not fit the schema is ignored rather than repaired,
+because a half-understood record would show the student a score that is
+not theirs.
+
+**Storage is probed, not assumed.** Some privacy modes throw on the very
+act of touching `localStorage`, so the guard is a write-and-remove inside
+a `try`, not a `typeof` check. When storage is unavailable the progress
+page says so plainly: every exercise still marks itself, only the record
+is lost.
+
+**A saved attempt shows through until the student touches the exercise.**
+Local state starts as null and the saved record is what renders; the first
+interaction takes over. That restores an attempt across a reload without
+copying storage into state.
+
+**Dates are formatted in a fixed `en-GB`/UTC format**, so the server
+render and the browser's own locale cannot disagree.
