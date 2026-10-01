@@ -1,26 +1,213 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ===================================================================== *
+ * Design tokens
+ *
+ * Instructional-materials discipline, not SaaS documentation:
+ *   - black on white, one accent (deep blue), nowhere else
+ *   - structure from rules and space, never from filled boxes
+ *   - serif for reading passages, sans for everything else
+ *
+ * Components must never hard-code a colour. Every value lives here.
+ * NOTE: shadcn owns `--accent` for its neutral hover surface, so the
+ * course accent is `--brand` to keep hover states from turning blue.
+ * ===================================================================== */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+
+  /* -- Ink and paper -------------------------------------------------- */
+  --paper: #ffffff;
+  --ink: #121212; /* 18.1:1 on paper */
+  --ink-muted: #595959; /*  7.0:1 on paper */
+  --brand: #1a4e8a; /*  8.4:1 on paper */
+  --brand-ink: #ffffff; /* text sitting on a brand fill */
+
+  /* -- Rules: the only structural device ------------------------------ */
+  --rule: #d4d4d4; /* hairline between rows, sections   */
+  --rule-strong: #121212; /* the bold rule under a table header */
+  --rule-accent: var(--brand); /* the thick bar on a callout         */
+
+  /* -- UI chrome (navigation only, never content) --------------------- */
+  --surface-muted: #f4f4f5;
+  --surface-hover: #ebebec;
+
+  /* -- Typography ----------------------------------------------------- */
+  --measure: 72ch; /* 70-78 characters of body text */
+  --measure-narrow: 62ch;
+  --text-body: 1.0625rem; /* 17px, above the 16px floor */
+  --leading-body: 1.6; /* above the 1.5 floor         */
+  --text-passage: 1.125rem; /* 18px, read under time pressure */
+  --leading-passage: 1.7;
+
+  /* -- Marking states -------------------------------------------------
+   * Colour is redundant here by design: every state also carries an
+   * icon and a text label, so a colour-blind student reads the same
+   * score. Correct takes the accent; incorrect stays ink and is marked
+   * by its icon, its label and a struck-through response.             */
+  --mark-correct: var(--brand);
+  --mark-correct-rule: var(--brand);
+  --mark-incorrect: var(--ink);
+  --mark-incorrect-rule: var(--ink);
+  --mark-unanswered: var(--ink-muted);
+
+  /* -- Timer ----------------------------------------------------------
+   * Overrun is information, not a failure state. It is never the only
+   * signal; the label switches to "over" alongside it.                */
+  --timer-running: var(--ink);
+  --timer-overrun: #a4262c; /* 5.9:1 on paper */
+
+  /* -- shadcn/ui mapping ---------------------------------------------- */
+  --radius: 0.25rem; /* near-square: rules, not rounded cards */
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-ink);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--surface-hover);
+  --accent-foreground: var(--ink);
+  --destructive: var(--timer-overrun);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--brand);
+
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--brand);
+  --sidebar-primary-foreground: var(--brand-ink);
+  --sidebar-accent: var(--surface-hover);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: var(--brand);
+}
+
+/* A genuine dark theme: the same contrast discipline re-derived on a
+ * dark ground, not the light palette inverted. */
+.dark {
+  color-scheme: dark;
+
+  --paper: #0f0f0f;
+  --ink: #ededed; /* 16.4:1 on paper */
+  --ink-muted: #a6a6a6; /*  7.9:1 on paper */
+  --brand: #8cb8e8; /*  9.3:1 on paper */
+  --brand-ink: #0f0f0f;
+
+  --rule: #2e2e2e;
+  --rule-strong: #ededed;
+
+  --surface-muted: #1a1a1a;
+  --surface-hover: #242424;
+
+  --timer-overrun: #f08c8c; /* 7.8:1 on paper */
 }
 
 @theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-hover: var(--surface-hover);
+
+  --color-mark-correct: var(--mark-correct);
+  --color-mark-incorrect: var(--mark-incorrect);
+  --color-mark-unanswered: var(--mark-unanswered);
+  --color-timer-running: var(--timer-running);
+  --color-timer-overrun: var(--timer-overrun);
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  /* A visible focus ring everywhere, in both themes. */
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 1px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Caps the line length of body copy at a readable measure. */
+  .measure {
+    max-width: var(--measure);
+  }
+
+  .measure-narrow {
+    max-width: var(--measure-narrow);
+  }
+
+  /* Reading passages and exam rubrics. */
+  .passage-type {
+    font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+    font-size: var(--text-passage);
+    line-height: var(--leading-passage);
+  }
 }
