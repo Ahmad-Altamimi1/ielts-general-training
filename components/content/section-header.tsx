@@ -1,6 +1,7 @@
 import { Clock, FileText, ListChecks } from "lucide-react";
 
 import type { Block, Part, Section } from "@/lib/content/schema";
+import { sectionNumber } from "@/lib/content/registry";
 import { skillFor } from "@/lib/content/tone";
 
 /** What this section contains, counted off the blocks so it can never
@@ -37,6 +38,7 @@ export function SectionHeader({
   const stats = summarise(section.blocks);
   const skill = skillFor(part.id);
   const percent = Math.round((position.index / position.total) * 100);
+  const number = sectionNumber(section.id);
 
   return (
     <header className="panel tone-field relative overflow-hidden rounded-2xl px-5 py-6 sm:px-8 sm:py-8">
@@ -70,7 +72,9 @@ export function SectionHeader({
       </div>
 
       <h1 className="font-heading mt-4 flex flex-wrap items-baseline gap-x-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.5rem]">
-        <span className="text-tone tabular-nums">{section.id}</span>
+        {number ? (
+          <span className="text-tone tabular-nums">{number}</span>
+        ) : null}
         <span>{section.title}</span>
       </h1>
 

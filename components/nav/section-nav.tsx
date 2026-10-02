@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-import { neighbours } from "@/lib/content/registry";
+import { neighbours, sectionNumber } from "@/lib/content/registry";
 
 /** Previous and next links at the foot of a section, crossing part
  *  boundaries so the book can be read straight through. */
@@ -30,9 +30,13 @@ export function SectionNav({
             Previous
           </span>
           <span className="text-sm">
-            <span className="font-heading font-bold text-tone tabular-nums">
-              {previous.section.id}
-            </span>{" "}
+            {sectionNumber(previous.section.id) ? (
+              <>
+                <span className="font-heading font-bold text-tone tabular-nums">
+                  {sectionNumber(previous.section.id)}
+                </span>{" "}
+              </>
+            ) : null}
             {previous.section.title}
           </span>
         </Link>
@@ -50,9 +54,13 @@ export function SectionNav({
             <ArrowRight aria-hidden="true" className="size-3.5" />
           </span>
           <span className="text-sm">
-            <span className="font-heading font-bold text-tone tabular-nums">
-              {next.section.id}
-            </span>{" "}
+            {sectionNumber(next.section.id) ? (
+              <>
+                <span className="font-heading font-bold text-tone tabular-nums">
+                  {sectionNumber(next.section.id)}
+                </span>{" "}
+              </>
+            ) : null}
             {next.section.title}
           </span>
         </Link>

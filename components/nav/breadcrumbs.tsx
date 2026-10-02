@@ -17,7 +17,9 @@ export type Crumb = { label: string; href?: string };
 export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
   return (
     <Breadcrumb className="print-hidden">
-      <BreadcrumbList className="text-sm">
+      {/* A touch target on a phone needs height; on a pointer device
+            the extra padding is harmless. */}
+      <BreadcrumbList className="gap-x-1 text-sm [&>li]:min-h-6 [&>li]:items-center [&_a]:flex [&_a]:min-h-6 [&_a]:items-center">
         {trail.map((crumb, i) => {
           const last = i === trail.length - 1;
           return (

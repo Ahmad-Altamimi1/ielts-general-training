@@ -403,3 +403,37 @@ table changes shape.
 
 Re-audited with axe-core after the change: home, section and progress
 pages, both themes — zero violations.
+
+## Revision 4 — responsive, measured rather than eyeballed
+
+Audited every page type at 320, 360, 390, 768, 1024 and 1440, checking
+for page-level overflow, elements escaping the viewport, touch targets
+under 24px and body text under 12.5px. Four real defects, all fixed.
+
+**Tables forced a horizontal scroll on phones for no reason.** Every
+table carried `min-w-xl` (576px), so even a two-column table of prose
+scrolled sideways on a 390px screen with its right-hand column cut off.
+The minimum is now set by column count: two columns wrap and fit, three
+get 26rem, four or more get 34rem and scroll — because squeezing four
+columns into 360px produces one word per line, which is worse than
+scrolling.
+
+**The sidebar docked at 768px and ate the tablet.** A 256px sidebar on a
+768px screen left 497px for the lesson; the landing page headline broke
+across three lines and the reading measure was squeezed. The sidebar is
+now a drawer below 1024px, which is where a docked column starts paying
+for itself. On the same screen the headline is one line and the content
+has 753px.
+
+**Practice Test 1 showed "reading Reading".** Its papers have slugs for
+ids rather than printed numbers, and the page rendered the id beside the
+title. `sectionNumber()` now returns the reference only when the book
+actually prints one, and every place that displayed an id goes through
+it — heading, breadcrumb, page title, sidebar, previous/next, part index.
+
+**Touch targets below 24px.** Breadcrumb links, the sidebar's expand
+control and the "On this page" links were 20–28px tall. All now clear
+24px on a phone, without changing the desktop layout.
+
+Re-audited afterwards with axe-core including the WCAG 2.2 target-size
+rule: zero violations, no page-level overflow at any width.

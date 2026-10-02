@@ -110,17 +110,27 @@ export function Callout({ block }: { block: BlockOf<"callout"> }) {
 export function ContentTable({ block }: { block: BlockOf<"table"> }) {
   const total = block.widths?.reduce((sum, w) => sum + w, 0);
 
+  // How narrow the table may get before scrolling is the lesser evil.
+  // Two columns of prose wrap perfectly well on a phone; four do not, and
+  // squeezing them produces one word per line. A fixed minimum for every
+  // table made the common two-column case scroll for no reason.
+  const columns = block.headers.length;
+  const minWidth =
+    columns <= 2 ? "" : columns === 3 ? "min-w-[26rem]" : "min-w-[34rem]";
+
   return (
-    // A table wider than a phone scrolls sideways, so the scroll container
-    // has to be reachable by keyboard: otherwise the right-hand columns
-    // are unreadable without a mouse.
+    // A table wider than the screen scrolls sideways, so the scroll
+    // container has to be reachable by keyboard: otherwise the right-hand
+    // columns are unreadable without a mouse.
     <div
       role="region"
       aria-label={`${block.headers[0] || "Data"} table`}
       tabIndex={0}
       className="break-inside-avoid -mx-4 mt-6 overflow-x-auto px-4 sm:mx-0 sm:px-0"
     >
-      <table className="w-full min-w-xl border-collapse text-left text-[0.9375rem]">
+      <table
+        className={`w-full border-collapse text-left text-[0.9375rem] ${minWidth}`}
+      >
         {block.widths && total ? (
           <colgroup>
             {block.widths.map((w, i) => (

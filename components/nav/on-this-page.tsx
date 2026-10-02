@@ -43,12 +43,12 @@ export function OnThisPage({ blocks }: { blocks: readonly Block[] }) {
       >
         On this page
       </h2>
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-3 space-y-0.5 lg:space-y-1.5">
         {entries.map((entry) => (
           <li key={entry.id}>
             <a
               href={`#${entry.id}`}
-              className="block text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+              className="flex min-h-9 items-center py-1.5 text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline lg:min-h-0 lg:py-0"
             >
               {entry.isExercise ? (
                 <span className="font-heading mr-1.5 text-[0.625rem] font-semibold tracking-wide text-tone uppercase">

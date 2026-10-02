@@ -1,6 +1,12 @@
 import * as React from "react";
 
-const MOBILE_BREAKPOINT = 768;
+/**
+ * Below this the sidebar is a drawer over the page rather than a docked
+ * column. Set at the desktop breakpoint, not the phone one: a 768px
+ * tablet docking a 256px sidebar leaves under 500px for the lesson,
+ * which breaks the headings and squeezes the reading measure.
+ */
+const MOBILE_BREAKPOINT = 1024;
 const QUERY = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`;
 
 function subscribe(onStoreChange: () => void) {

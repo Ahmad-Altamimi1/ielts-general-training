@@ -10,6 +10,7 @@ import {
   getSection,
   partHref,
   partLabel,
+  sectionNumber,
 } from "@/lib/content/registry";
 import { toneFor } from "@/lib/content/tone";
 
@@ -26,7 +27,12 @@ export async function generateMetadata({
   const { part: partId, section: sectionId } = await params;
   const found = getSection(partId, decodeURIComponent(sectionId));
   if (!found) return {};
-  return { title: `${found.section.id} ${found.section.title}` };
+  const number = sectionNumber(found.section.id);
+  return {
+    title: number
+      ? `${number} ${found.section.title}`
+      : found.section.title,
+  };
 }
 
 export default async function SectionPage({
@@ -48,7 +54,11 @@ export default async function SectionPage({
         trail={[
           { label: "Course", href: "/" },
           { label: partLabel(part), href: partHref(part.id) },
-          { label: `${section.id} ${section.title}` },
+          {
+            label: sectionNumber(section.id)
+              ? `${sectionNumber(section.id)} ${section.title}`
+              : section.title,
+          },
         ]}
       />
 

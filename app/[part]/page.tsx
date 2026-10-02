@@ -9,6 +9,7 @@ import {
   partLabel,
   parts,
   sectionHref,
+  sectionNumber,
 } from "@/lib/content/registry";
 import { skillFor, toneFor } from "@/lib/content/tone";
 import type { Section } from "@/lib/content/schema";
@@ -75,7 +76,7 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
                 href={sectionHref(part.id, first.id)}
                 className="font-heading inline-flex items-center gap-2 rounded-lg bg-tone px-4 py-2.5 text-sm font-semibold text-brand-ink transition hover:opacity-90"
               >
-                Start at {first.id} {first.title}
+                Start at {sectionNumber(first.id) ?? ""} {first.title}
                 <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
             ) : null}
@@ -130,10 +131,14 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
                           {section.title}
                         </span>
                         <span className="mt-0.5 block text-xs text-ink-muted tabular-nums">
-                          {section.id}
-                          {count > 0
-                            ? ` · ${count} exercise${count === 1 ? "" : "s"}`
-                            : ""}
+                          {[
+                            sectionNumber(section.id),
+                            count > 0
+                              ? `${count} exercise${count === 1 ? "" : "s"}`
+                              : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
                         </span>
                       </span>
 

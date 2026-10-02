@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAllProgress } from "@/hooks/use-progress";
 import type { NavPart } from "@/lib/content/nav";
+import { sectionNumber } from "@/lib/content/registry";
 import { toneFor } from "@/lib/content/tone";
 
 /** True when `href` is the page being viewed. Section ids are
@@ -118,7 +119,7 @@ export function SidebarNav({ tree }: { tree: NavPart[] }) {
                       <button
                         type="button"
                         aria-label={`Sections of ${part.label}`}
-                        className="flex size-7 shrink-0 items-center justify-center rounded-sm text-ink-muted hover:bg-sidebar-accent hover:text-ink"
+                        className="flex size-9 shrink-0 items-center justify-center rounded-md text-ink-muted hover:bg-sidebar-accent hover:text-ink"
                       >
                         <ChevronRight
                           aria-hidden="true"
@@ -140,15 +141,17 @@ export function SidebarNav({ tree }: { tree: NavPart[] }) {
                               href={section.href}
                               onClick={close}
                               aria-current={active ? "page" : undefined}
-                              className={`-ml-px flex items-start gap-2 border-l-2 py-1.5 pl-3 text-sm transition ${
+                              className={`-ml-px flex min-h-9 items-start gap-2 border-l-2 py-2 pl-3 text-sm transition ${
                                 active
                                   ? "border-tone bg-tone-wash font-medium text-ink"
                                   : "border-transparent text-ink-muted hover:border-tone/40 hover:text-ink"
                               }`}
                             >
-                              <span className="font-heading shrink-0 pt-px text-xs font-bold text-tone tabular-nums">
-                                {section.id}
-                              </span>
+                              {sectionNumber(section.id) ? (
+                                <span className="font-heading shrink-0 pt-px text-xs font-bold text-tone tabular-nums">
+                                  {sectionNumber(section.id)}
+                                </span>
+                              ) : null}
                               <span className="min-w-0 flex-1">
                                 {section.title}
                               </span>

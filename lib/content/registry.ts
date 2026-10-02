@@ -98,6 +98,19 @@ export function neighbours(partId: string, sectionId: string): {
   };
 }
 
+/**
+ * The section's printed reference, when it has one.
+ *
+ * Numbered sections keep the book's own label ("3.5", "b.4"). Sections
+ * the book does not number — the papers inside Practice Test 1 — have a
+ * slug for an id, and showing it renders "reading Reading".
+ */
+export function sectionNumber(sectionId: string): string | null {
+  return /^(?:[0-9]+\.[0-9]+|[a-z]\.[0-9]+)$/i.test(sectionId)
+    ? sectionId
+    : null;
+}
+
 /** How the part is labelled in navigation: "Part 3", or the title itself
  *  for front and back matter, which carry no number. */
 export function partLabel(part: Part): string {
