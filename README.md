@@ -10,8 +10,15 @@ student does stays in their own browser.
 
 ```bash
 npm install
-npm run content   # build content/ from the Word book
 npm run dev
+```
+
+`content/` is committed, so the app builds and runs without the book.
+To regenerate it you need the Word book, which is not in this repository
+because it is the teacher's material:
+
+```bash
+IELTS_BOOK="/path/to/IELTS-GT-Student-Book.docx" npm run content
 ```
 
 | Script | What it does |

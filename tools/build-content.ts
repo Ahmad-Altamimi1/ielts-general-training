@@ -17,7 +17,15 @@ import { docxToParts, type DraftPart } from "./docx/to-content";
 import { partSchema, type Block } from "../lib/content/schema";
 import { SEARCH_INDEX_PATH, type SearchEntry } from "../lib/search/types";
 
-const DEFAULT_DOCX = "C:\\Users\\ASUS\\Downloads\\IELTS-GT-Student-Book.docx";
+/**
+ * Where the book lives.
+ *
+ * The .docx is not in the repository — it is the teacher's material, and
+ * `content/` is generated from it. Point at it with an argument or the
+ * IELTS_BOOK environment variable; the default is the repository root.
+ */
+const DEFAULT_DOCX =
+  process.env.IELTS_BOOK ?? join(process.cwd(), "IELTS-GT-Student-Book.docx");
 const CONTENT_DIR = join(process.cwd(), "content");
 const PUBLIC_DIR = join(process.cwd(), "public");
 
