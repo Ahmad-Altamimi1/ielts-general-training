@@ -220,8 +220,14 @@ export const partSchema = z
     /** null for front matter and appendices. */
     number: z.number().int().positive().nullable(),
     title: z.string().min(1),
-    /** One line, for the sidebar and the part index page. */
-    summary: z.string().min(1),
+    /** One line, for the sidebar and the part index page.
+     *
+     *  Optional because the book's printed Contents page summarises the
+     *  numbered parts and nothing else. Requiring it kept three real
+     *  parts — How to Use This Book, the answer-key appendix and A Final
+     *  Note — out of the app entirely, which is a worse outcome than a
+     *  card without a subtitle. */
+    summary: z.string().min(1).optional(),
     /** Prose the book prints under the part title, before its first
      *  numbered section.
      *

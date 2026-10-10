@@ -489,3 +489,37 @@ fails while `curl` serves them correctly and the deployed HTTPS site
 renders perfectly in the same pane. An environment fault, not an app one.
 The pane also reports zero speech voices, so the audio itself could not be
 heard here. The player needs one look in a real browser.
+
+## Revision 6 — three parts of the book were invisible
+
+**DEVIATION FROM THE BRIEF'S MODEL — `Part.summary` is now optional.**
+
+The brief types it as required. The book's printed Contents page gives a
+one-line summary for every numbered part and for nothing else, so
+requiring it kept three real parts out of the app entirely since the first
+milestone: **How to Use This Book**, the **answer-key appendix**, and
+**A Final Note**. A card without a subtitle is a far better outcome than a
+part of the book the student cannot reach.
+
+That last one matters for the listening question: A Final Note is where
+the book lists where to get real official practice material — British
+Council free practice tests, IDP's free General Training samples with
+recordings and transcripts, IELTS Ready and Road to IELTS, Cambridge
+IELTS 21. Students could not see that list.
+
+The book now renders in full: 14 parts, 77 sections indexed, 96 pages.
+
+**On reusing existing listening material.** British Council, IDP and
+Cambridge material is copyrighted: the app can point students at it, which
+is what the book already does, and must not host it. VOA Learning English
+is US federal government work and its own reuse page allows reprinting
+with credit to learningenglish.voanews.com, excluding third-party agency
+material (AP, Reuters, AFP) and subject to separate rules for US domestic
+outlets — worth confirming against their current terms before building on
+it. Either way, no external recording can serve the book's existing
+questions, because Appendix B already fixes their answers.
+
+**Note on the answer-key appendix now being public.** It is in the printed
+student book, so rendering it matches what students already have, and the
+brief rules out gated content. The Practice Test 1 key is still absent, by
+the book's own decision.

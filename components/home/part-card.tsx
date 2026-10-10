@@ -57,9 +57,11 @@ export function PartCard({ part }: { part: NavPart }) {
         <h3 className="font-heading mt-3 text-lg leading-snug font-semibold tracking-tight">
           {part.title}
         </h3>
-        <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-          {part.summary}
-        </p>
+        {part.summary ? (
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+            {part.summary}
+          </p>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-3 border-t border-layer-border px-5 py-3 pl-6 text-xs text-ink-muted">

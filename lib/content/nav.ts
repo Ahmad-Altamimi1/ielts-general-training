@@ -19,7 +19,7 @@ export type NavPart = {
   /** "Part 3", or the title for front and back matter. */
   label: string;
   title: string;
-  summary: string;
+  summary?: string;
   href: string;
   sections: NavSection[];
   exerciseIds: string[];
@@ -47,7 +47,7 @@ export function navTree(): NavPart[] {
       number: part.number,
       label: partLabel(part),
       title: part.title,
-      summary: part.summary,
+      ...(part.summary ? { summary: part.summary } : {}),
       href: partHref(part.id),
       sections,
       exerciseIds: sections.flatMap((s) => s.exerciseIds),

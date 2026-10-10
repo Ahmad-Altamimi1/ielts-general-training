@@ -68,7 +68,11 @@ export default async function PartPage({ params }: PageProps<"/[part]">) {
           <h1 className="font-heading mt-4 max-w-2xl text-4xl leading-tight font-bold tracking-tight text-balance sm:text-5xl">
             {part.title}
           </h1>
-          <p className="measure mt-3 text-lg text-ink-muted">{part.summary}</p>
+          {part.summary ? (
+            <p className="measure mt-3 text-lg text-ink-muted">
+              {part.summary}
+            </p>
+          ) : null}
 
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
             {first ? (

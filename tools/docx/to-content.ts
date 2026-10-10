@@ -557,7 +557,7 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
         };
         if (!summaries.has(id)) {
           warnings.push(
-            `${id} ("${part.title}"): the book's Contents page gives no one-line summary, and \`summary\` is required. Supply one line.`,
+            `${id} ("${part.title}"): the book's Contents page gives no one-line summary. The part is generated without one; add a Contents line to give it a subtitle.`,
           );
         }
         parts.push(part);
