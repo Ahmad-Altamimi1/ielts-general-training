@@ -1,4 +1,5 @@
 import { parts as generated } from "@/content";
+import { extraParts } from "@/content/extra";
 import { partSchema, type Block, type Part, type Section } from "./schema";
 
 /* ===================================================================== *
@@ -47,7 +48,13 @@ function validateAll(input: readonly unknown[]): Part[] {
   return out;
 }
 
-export const parts: readonly Part[] = validateAll(generated);
+/** The book, then anything written for the app. Both go through the same
+ *  validation: a hand-written part gets no more latitude than a
+ *  generated one. */
+export const parts: readonly Part[] = validateAll([
+  ...generated,
+  ...extraParts,
+]);
 
 /** A section together with the part that contains it. */
 export type SectionRef = { part: Part; section: Section };

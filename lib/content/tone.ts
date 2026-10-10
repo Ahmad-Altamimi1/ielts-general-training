@@ -30,6 +30,7 @@ const BY_PART: Record<string, Tone> = {
   "part-9": "slate", // Study plan
   "part-10": "cyan", // Practice bank
   "part-11": "rose", // Practice test
+  "listening-lab": "violet", // Extra listening, same hue as Listening
 };
 
 /** What the part teaches, for the badge on its card. */
@@ -39,6 +40,7 @@ const SKILL: Record<string, string> = {
   "part-4": "Writing",
   "part-5": "Writing",
   "part-6": "Speaking",
+  "listening-lab": "Listening",
 };
 
 export function toneFor(partId: string): Tone {

@@ -47,6 +47,7 @@ export function ListeningPlayer({
   const [showScript, setShowScript] = useState(false);
   const [supported, setSupported] = useState(true);
   const utterances = useRef<SpeechSynthesisUtterance[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Cancel any speech if the student navigates away mid-recording.
   useEffect(() => {
@@ -57,7 +58,18 @@ export function ListeningPlayer({
     };
   }, []);
 
-  const speak = useCallback(() => {
+  const play = useCallback(() => {
+    // A real recording, where there is one: a voice someone actually used
+    // is worth more than a synthesised one.
+    const element = audioRef.current;
+    if (element) {
+      element.currentTime = 0;
+      setPhase("speaking");
+      setPlays((n) => n + 1);
+      void element.play().catch(() => setPhase("done"));
+      return;
+    }
+
     if (!("speechSynthesis" in window)) {
       setSupported(false);
       return;
@@ -88,6 +100,7 @@ export function ListeningPlayer({
   }, [script.lines, voices]);
 
   const stop = useCallback(() => {
+    audioRef.current?.pause();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     setPhase("done");
   }, []);
@@ -100,6 +113,18 @@ export function ListeningPlayer({
       aria-label={`${label}: listening`}
       className="print-hidden mt-6 overflow-hidden rounded-xl border border-layer-border bg-layer-strip"
     >
+      {script.audio ? (
+        // Deliberately without `controls`: a scrub bar is a rewind button,
+        // and the whole point is that a recording plays once.
+        <audio
+          ref={audioRef}
+          src={script.audio}
+          preload="none"
+          onEnded={() => setPhase("done")}
+          onError={() => setSupported(false)}
+        />
+      ) : null}
+
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3.5 sm:px-5">
         <Headphones aria-hidden="true" className="size-5 shrink-0 text-tone" />
 
@@ -111,7 +136,9 @@ export function ListeningPlayer({
             {phase === "speaking"
               ? "Playing. It will not repeat."
               : plays === 0
-                ? "Played once, at normal speed, with no repetition."
+                ? script.audio
+                  ? "A real recording. It plays once, as in the test."
+                  : "Read aloud by this browser, once, at normal speed."
                 : `Played ${plays} time${plays === 1 ? "" : "s"}.`}
           </span>
         </p>
@@ -125,7 +152,7 @@ export function ListeningPlayer({
           <Button
             type="button"
             size="sm"
-            onClick={speak}
+            onClick={play}
             disabled={!hydrated}
             className="bg-tone text-brand-ink hover:bg-tone hover:opacity-90"
           >
@@ -144,8 +171,27 @@ export function ListeningPlayer({
 
       {!supported ? (
         <p className="border-t border-layer-border px-4 py-3 text-sm sm:px-5">
-          This browser cannot read the script aloud. Ask your teacher to read
-          it, or show the script below and read it to a partner.
+          {script.audio
+            ? "The recording could not be played. Show the script below and read it to a partner instead."
+            : "This browser cannot read the script aloud. Ask your teacher to read it, or show the script below and read it to a partner."}
+        </p>
+      ) : null}
+
+      {script.credit ? (
+        <p className="border-t border-layer-border px-4 py-2 text-xs text-ink-muted sm:px-5">
+          Recording and transcript:{" "}
+          {script.creditUrl ? (
+            <a
+              href={script.creditUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-ink"
+            >
+              {script.credit}
+            </a>
+          ) : (
+            script.credit
+          )}
         </p>
       ) : null}
 

@@ -22,6 +22,7 @@ function paperFor(
   if (title.includes("reading")) return "reading";
   if (partId === "part-2") return "listening";
   if (partId === "part-3") return "reading";
+  if (partId === "listening-lab") return "listening";
   if (sectionId === "listening") return "listening";
   if (sectionId === "reading") return "reading";
   return null;

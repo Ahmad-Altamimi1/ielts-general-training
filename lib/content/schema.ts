@@ -181,6 +181,17 @@ export const blockSchema = z.discriminatedUnion("kind", [
     title: z.string().min(1),
     /** "Recording 1", when the book names it. */
     recording: z.string().min(1).optional(),
+    /** A real recording, served from `public/`. Without one the script is
+     *  read aloud by the browser instead. */
+    audio: z
+      .string()
+      .regex(/^\/[\w./-]+\.mp3$/, { message: "audio must be a path under /" })
+      .optional(),
+    /** Who made the recording, and where it came from. Required whenever
+     *  the audio is someone else's work, so that provenance cannot be
+     *  separated from the content. */
+    credit: z.string().min(1).optional(),
+    creditUrl: z.string().url().optional(),
     lines: z
       .array(
         z.object({
