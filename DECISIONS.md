@@ -653,3 +653,12 @@ reads the same registry the pages read. 85 sections indexed, up from 77.
 
 **Audio is now 22 MB across eight files.** Still comfortable as static
 assets; worth revisiting if this part ever doubles again.
+
+**Numbers are accepted as figures and as words.** The marker is
+deliberately literal — it never decides that "ten" means 10 — so offering
+both forms is the key's job, and the real test accepts both. Checking a
+live unit turned up that I had done this for some questions and not
+others: "ten" was marked wrong for an answer of "10". Every numeric answer
+in the Lab now carries both, and `answers.test.ts` fails the build if a
+future one carries only one. Broken on purpose first, as usual:
+`ex-lab-5 q7: accepts "10" but not "ten"`.

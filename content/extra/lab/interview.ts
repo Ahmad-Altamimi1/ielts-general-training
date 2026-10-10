@@ -75,8 +75,8 @@ export const interviewSection: Section = {
           {
             n: 7,
             prompt: "Time of the interview: … am",
-            answers: ["10"],
-            why: 'Ten in the morning, the next day. "Tomorrow morning" is said first and is not what the gap wants — "am" is already printed, so the gap can only be the number.',
+            answers: ["10", "ten"],
+            why: 'Ten in the morning, the next day. "Tomorrow morning" is said first and is not what the gap wants — "am" is already printed, so the gap can only be the time. Figures or words are both accepted, as in the real test.',
           },
           {
             n: 8,
@@ -88,8 +88,8 @@ export const interviewSection: Section = {
             n: 9,
             prompt:
               "He spoke to nobody for … months, which he calls the best time of his life.",
-            answers: ["two"],
-            why: '"The best two months of my life." The same sentence also says "last year", and a student writing the first number they hear puts that in. The gap is followed by "months", which rules it out.',
+            answers: ["two", "2"],
+            why: '"The best two months of my life." The same sentence also says "last year", and a student writing the first number they hear puts that in. The gap is followed by "months", which rules that out.',
           },
           {
             n: 10,

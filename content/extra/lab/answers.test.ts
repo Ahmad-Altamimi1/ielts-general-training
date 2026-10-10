@@ -139,3 +139,81 @@ describe("Listening Lab", () => {
     }
   });
 });
+
+/* --------------------------------------------------------------------- *
+ * Numbers may be written either way.
+ *
+ * The marker is deliberately literal: it never decides that "ten" means
+ * 10, because a marker that guesses at meaning will eventually guess
+ * wrong. That makes it the key's job to offer both forms, and the real
+ * test accepts both. The rule is easy to keep for the question you are
+ * writing and easy to forget on the next one, so it is checked.
+ * --------------------------------------------------------------------- */
+
+const UNITS = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
+  "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen",
+];
+const TENS = [
+  "", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+  "eighty", "ninety",
+];
+
+/** Words for 0 to 100, which covers every number a listening answer is. */
+function inWords(n: number): string | null {
+  if (n < 0 || n > 100 || !Number.isInteger(n)) return null;
+  if (n === 100) return "one hundred";
+  if (n < 20) return UNITS[n];
+  const unit = n % 10;
+  return unit === 0
+    ? TENS[Math.floor(n / 10)]
+    : `${TENS[Math.floor(n / 10)]}-${UNITS[unit]}`;
+}
+
+const WORD_TO_FIGURE = new Map<string, string>();
+for (let n = 0; n <= 100; n++) {
+  const word = inWords(n);
+  if (word) WORD_TO_FIGURE.set(word.replace(/-/g, " "), String(n));
+}
+
+describe("numbers", () => {
+  it("are accepted as figures and as words, both ways round", () => {
+    const missing: string[] = [];
+    const flat = (s: string) => s.toLowerCase().replace(/-/g, " ").trim();
+
+    for (const unit of units) {
+      for (const exercise of unit.exercises) {
+        if (exercise.kind === "mcq" || exercise.kind === "matching") continue;
+
+        for (const question of exercise.questions) {
+          const accepted = new Set(question.answers.map(flat));
+
+          for (const answer of question.answers) {
+            const figure = /^\d+$/.test(answer.trim())
+              ? Number(answer.trim())
+              : null;
+            if (figure !== null) {
+              const word = inWords(figure);
+              if (word && !accepted.has(flat(word))) {
+                missing.push(
+                  `${exercise.id} q${question.n}: accepts "${answer}" but not "${word}"`,
+                );
+              }
+              continue;
+            }
+
+            const asFigure = WORD_TO_FIGURE.get(flat(answer));
+            if (asFigure && !accepted.has(asFigure)) {
+              missing.push(
+                `${exercise.id} q${question.n}: accepts "${answer}" but not "${asFigure}"`,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    expect(missing).toEqual([]);
+  });
+});

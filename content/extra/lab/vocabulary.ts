@@ -35,7 +35,7 @@ export const vocabularySection: Section = {
             n: 1,
             prompt:
               "To fully understand a written text, a learner needs to know … per cent of its words or more.",
-            answers: ["95"],
+            answers: ["95", "ninety-five"],
             why: "Four numbers arrive in the opening half-minute — 500, 1,000, 95 and 100. This one is the percentage, and the gap says so by printing \"per cent\" after it.",
           },
           {
@@ -55,8 +55,8 @@ export const vocabularySection: Section = {
             n: 4,
             prompt:
               "Write down and repeat three to … more sentences using the new vocabulary.",
-            answers: ["five"],
-            why: 'A range, "three to five", with the first half printed. Writing "3" here would also be wrong for a different reason: the recording says the word, and this is the number you are asked for, not the one you are given.',
+            answers: ["five", "5"],
+            why: 'A range, "three to five", with the first half printed. The gap wants the second of the two, not the first — writing "three" is copying what is already on the page.',
           },
           {
             n: 5,
@@ -68,7 +68,7 @@ export const vocabularySection: Section = {
             n: 6,
             prompt:
               "Rather than learning the names of 12 birds at once, learn … or three of them.",
-            answers: ["two"],
+            answers: ["two", "2"],
             why: "Three numbers in one example: 12 birds, then two or three at a time. The gap is followed by \"or three\", which leaves only one of them possible — grammar settles this before the recording reaches it.",
           },
         ],

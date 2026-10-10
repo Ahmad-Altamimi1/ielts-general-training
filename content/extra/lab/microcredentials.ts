@@ -55,7 +55,7 @@ export const microcredentialsSection: Section = {
             n: 5,
             prompt:
               "Coursera's report: … per cent of US colleges offering microcredentials also give school credit.",
-            answers: ["51"],
+            answers: ["51", "fifty-one"],
             why: "Fifty-one per cent, said once. Note what the figure counts: colleges that already give credit, not the ones that plan to, which is the next thing the speaker says.",
           },
           {
@@ -80,7 +80,7 @@ export const microcredentialsSection: Section = {
           {
             n: 9,
             prompt: "Coursera Plus costs $… a month, or $399 a year.",
-            answers: ["59"],
+            answers: ["59", "fifty-nine"],
             why: "Fifty-nine dollars monthly. The yearly figure, 399, is printed in the same line and is said immediately afterwards — the trap is hearing the second number and writing that.",
           },
           {
