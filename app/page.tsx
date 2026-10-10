@@ -1,5 +1,6 @@
 import { BookOpen, ListChecks, MessageSquare, Timer } from "lucide-react";
 
+import { SchoolHeader } from "@/components/brand/school-header";
 import { PartCard } from "@/components/home/part-card";
 import { BandPanel } from "@/components/study/band-panel";
 import { NextUp } from "@/components/study/next-up";
@@ -21,6 +22,8 @@ export default function HomePage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl pb-10">
+      <SchoolHeader className="mb-3 print:hidden" />
+
       {/* ---- Hero ---------------------------------------------------- */}
       <section className="relative overflow-hidden rounded-2xl border border-layer-border bg-layer-raised">
         <div

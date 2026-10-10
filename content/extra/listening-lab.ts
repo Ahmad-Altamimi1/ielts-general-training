@@ -2,8 +2,12 @@ import type { Part } from "@/lib/content/schema";
 
 import { budgetCutsSection } from "./lab/budget-cuts";
 import { emailSection } from "./lab/email";
+import { gettysburgSection } from "./lab/gettysburg";
+import { interviewSection } from "./lab/interview";
 import { memoryPalaceSection } from "./lab/memory-palace";
 import { microcredentialsSection } from "./lab/microcredentials";
+import { pearlBuckSection } from "./lab/pearl-buck";
+import { vocabularySection } from "./lab/vocabulary";
 
 /* ===================================================================== *
  * Listening Lab — NOT PART OF THE BOOK.
@@ -11,12 +15,16 @@ import { microcredentialsSection } from "./lab/microcredentials";
  * The book's own listening units are read aloud by the teacher from
  * Appendix A, which the manuscript does not yet contain. This part exists
  * so that a student working alone has something to listen to, and so that
- * the four shapes of the Listening paper are each practised once:
+ * every shape the Listening paper uses is practised at least once:
  *
  *   lab-1  note completion, academic monologue        (Section 4)
  *   lab-2  multiple choice, practical monologue       (Section 2)
  *   lab-3  matching and completion, several voices    (Section 3)
  *   lab-4  sentence completion, long monologue        (Section 4)
+ *   lab-5  form completion, two conversations         (Section 1)
+ *   lab-6  short answer, a talk about a place         (Section 2)
+ *   lab-7  summary completion, a life story           (Section 4)
+ *   lab-8  notes and multiple choice, a long talk     (Section 4)
  *
  * Provenance, kept explicit on purpose:
  *   - the recordings and their transcripts are Voice of America Learning
@@ -51,7 +59,7 @@ const part: Part = {
     },
     {
       kind: "prose",
-      md: "The four units practise the four shapes the Listening paper uses: a monologue with notes to complete, a practical talk with multiple choice, a conversation between several voices, and a long academic talk.",
+      md: "The eight units cover every shape the paper uses: notes, a form, a summary, sentence completion, short answers, multiple choice and matching — across a conversation, a practical talk, a talk about a place, and four academic monologues.",
     },
   ],
   sections: [
@@ -59,6 +67,10 @@ const part: Part = {
     emailSection,
     budgetCutsSection,
     memoryPalaceSection,
+    interviewSection,
+    gettysburgSection,
+    pearlBuckSection,
+    vocabularySection,
   ],
 };
 

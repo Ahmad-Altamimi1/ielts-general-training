@@ -98,7 +98,7 @@ function transcriptFrom(html: string): string[] {
   // Page furniture and the course boilerplate VOA appends to every
   // lesson. None of it is spoken on the recording.
   const FURNITURE =
-    /^(Share|Print|Follow us|See comments|Embed|No media source currently available|The URL has been copied|Download the VOA|Send us an email|Now it's your turn|Be sure to download|Write to us|See the Lesson Plan|Start the Quiz|_)/i;
+    /^(Share|Print|Follow us|See comments|Embed|No media source currently available|The URL has been copied|Download the VOA|Send us an email|Now it's your turn|Be sure to download|Write to us|See the Lesson Plan|See how well you understand|Start the Quiz|_)/i;
   // The embedded player lists its download options as list items.
   const DOWNLOAD_OPTION = /^\d+\s*kbps\b/i;
 

@@ -8,13 +8,26 @@
  * everywhere.
  */
 export const COURSE = {
-  title: "IELTS General Training",
+  title: "IELTS Training",
   level: "Grade 12 · Student Book",
   tagline:
     "The method, marked practice, and an explanation for every answer — right ones included.",
 
-  teacherName: "Qasim Bawa'neh",
+  teacherName: "Qasem Bawa'neh",
   teacherRole: "Taught by",
+
+  /**
+   * The school's own letterhead, copied from the header of its printed
+   * worksheets. It is written here in Arabic because that is how the
+   * school writes it, and it is shown exactly as given — this is an
+   * institution's name, not copy to be improved.
+   */
+  school: {
+    council: "مجلس تعليمي: مكتب الفجيرة والشارقة الشرقية",
+    zone: "نطاق: DNE.8.3",
+    name: "مدرسة: عبد الله بن الزبير الحلقة الثالثة بنين",
+    principal: "مدير المدرسة: الأستاذ راشد الخديم",
+  },
 
   promises: [
     {

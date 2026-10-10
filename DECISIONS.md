@@ -567,3 +567,89 @@ text of the recording: trimming them would leave the script and the audio
 disagreeing.
 
 **Audio is 15 MB across four files**, served as static assets.
+
+---
+
+## The name, the logo slot, and eight units
+
+**"IELTS General Training" is now "IELTS Training"**, as asked. The change
+is to the product's name only — `lib/course.ts`, the page metadata, the
+sidebar and the README. The book's own sentences still say "General
+Training" wherever they are describing the module, because they are
+describing it correctly: Reading and Writing really are different in the
+two versions, and GT Reading really does need more correct answers for the
+same band. Editing those would have made the course wrong rather than
+renamed.
+
+**The school's letterhead is rebuilt, not pasted in.** The header at the
+top of the school's printed worksheets — the ministry emblem, the council
+and zone, the school's name, the National Charter and We the UAE 2031 —
+now opens the front page and heads anything printed from the site. The
+four emblems were cut out of the worksheet header and are served as
+images; everything else is text, so it can be read aloud, searched,
+selected and reflowed on a phone, which a screenshot cannot do. The
+subject line reads "IELTS Training", in the place the worksheet puts the
+lesson title.
+
+The letterhead is light in both themes. A letterhead is a sheet of paper,
+the emblems were drawn for white, and a band that followed the dark theme
+would have put white text on pale blue — so `--letterhead-paper`,
+`--letterhead-ink`, `--letterhead-band` and `--letterhead-band-ink` are
+fixed, and in print the band drops to a rule rather than a block of toner.
+
+The emblems came out of a screenshot of a Word header, so they are as
+sharp as that screenshot allows — cut at three times their printed size
+to survive being scaled. Originals would look better and need no code
+change.
+
+**The chrome keeps a general logo slot.** `lib/brand.ts` reads
+`public/brand/` while the pages are generated and puts whatever it finds
+beside the course name in the sidebar and the top bar — today the ministry
+emblem, tomorrow whatever replaces it. An empty folder is not an error:
+the name stands alone.
+
+`next/image` needs an image's real size before the file loads, and
+guessing it would stretch somebody's emblem, so the size is read out of
+the file's own header — PNG, GIF, WebP, JPEG, and an SVG's width/height or
+viewBox. A file it cannot measure stops the build and names itself.
+`lib/brand.test.ts` checks each format against a header whose real
+dimensions are known, including the failure. SVGs are served unoptimised:
+Next refuses to put one through the image optimiser by default, and there
+is nothing to gain by resizing a vector.
+
+That test wrote its fixtures into `public/brand/` and tidied up after
+itself, so the first run after a real logo was added deleted the logo.
+`brandLogos` now takes the directory it reads and the fixtures go to a
+scratch one. A test that can damage what it is testing is worse than no
+test, because it only does it once and then passes.
+
+**The Listening Lab is eight units.** Four more recordings, 36 more
+questions, chosen so that every shape the Listening paper uses is now
+practised at least once:
+
+| Unit | Recording | Type | Paper shape |
+| --- | --- | --- | --- |
+| lab-5 | Lesson 2: The Interview | form completion | Section 1 |
+| lab-6 | American Places – Gettysburg | short answer | Section 2 |
+| lab-7 | Pearl S. Buck | summary completion | Section 4 |
+| lab-8 | Raise Your English Level | notes + multiple choice | Section 4 |
+
+lab-5 is the sequel to lab-3's recording — the meeting Ms. Weaver calls at
+the end of one is the meeting referred to at the start of the other — so
+the two can be done together as a longer listening.
+
+A fourth fetcher fault, found the same way as the first three: VOA appends
+"See how well you understand this lesson by taking a listening quiz" to
+every lesson page, and it was arriving as a transcript line. Re-fetching
+the vocabulary report with the `<li>` fix also took it from 265 words to
+769; the earlier copy was missing every piece of advice in the talk.
+
+**Search is built from the registry now, not from the book.** The index
+was generated inside `tools/build-content.ts`, which reads the .docx — so
+the eight Listening Lab units, which are not in the book, could never be
+found with Cmd+K, and the index could not be rebuilt from a clean
+checkout. It moved to `tools/build-index.ts` (`npm run index`), which
+reads the same registry the pages read. 85 sections indexed, up from 77.
+
+**Audio is now 22 MB across eight files.** Still comfortable as static
+assets; worth revisiting if this part ever doubles again.

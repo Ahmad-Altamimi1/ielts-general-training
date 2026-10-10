@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
 import { AppSidebar } from "@/components/app-sidebar";
+import { BrandMark } from "@/components/brand/brand-mark";
+import { SchoolHeader } from "@/components/brand/school-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SearchDialog } from "@/components/search/search-dialog";
@@ -33,11 +36,11 @@ const serif = Source_Serif_4({
 
 export const metadata: Metadata = {
   title: {
-    default: "IELTS General Training",
-    template: "%s · IELTS General Training",
+    default: "IELTS Training",
+    template: "%s · IELTS Training",
   },
   description:
-    "An interactive IELTS General Training course: the method, marked practice, and an explanation for every answer.",
+    "An interactive IELTS course: the method, marked practice, and an explanation for every answer.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -59,8 +62,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <AppSidebar />
 
             <div className="flex min-h-svh w-full min-w-0 flex-col bg-layer-page">
+              {/* A printed worksheet with no name on it belongs to nobody. */}
+              <div className="hidden print:block">
+                <SchoolHeader />
+              </div>
+
               <header className="print-hidden sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-layer-border bg-layer-page/90 px-3 backdrop-blur-sm sm:px-6">
                 <SidebarTrigger />
+                <Link href="/" className="min-w-0 md:hidden">
+                  <BrandMark logoClassName="h-6 w-auto" />
+                </Link>
                 <div className="ml-auto flex items-center gap-2">
                   <SearchDialog />
                   <ThemeToggle />

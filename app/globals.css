@@ -31,6 +31,15 @@
   --brand: #1a4e8a; /*  8.4:1 on paper */
   --brand-ink: #ffffff; /* text sitting on a brand fill */
 
+  /* -- The school's letterhead ---------------------------------------- *
+   * A letterhead is a sheet of paper. These four do not change with the
+   * theme — the emblems on it were drawn for white, and a band that
+   * followed the dark theme would put white text on pale blue.           */
+  --letterhead-paper: #ffffff;
+  --letterhead-ink: #17356b; /* 10.4:1 on letterhead paper */
+  --letterhead-band: #1a4e8a; /*  8.4:1 under white        */
+  --letterhead-band-ink: #ffffff;
+
   /* -- Rules: the only structural device ------------------------------ */
   --rule: #d4d4d4; /* hairline between rows, sections   */
   --rule-strong: #121212; /* the bold rule under a table header */
@@ -228,6 +237,10 @@
   --color-ink-muted: var(--ink-muted);
   --color-brand: var(--brand);
   --color-brand-ink: var(--brand-ink);
+  --color-letterhead-paper: var(--letterhead-paper);
+  --color-letterhead-ink: var(--letterhead-ink);
+  --color-letterhead-band: var(--letterhead-band);
+  --color-letterhead-band-ink: var(--letterhead-band-ink);
   --color-rule: var(--rule);
   --color-rule-strong: var(--rule-strong);
   --color-surface-muted: var(--surface-muted);
@@ -330,6 +343,9 @@
     --ink-muted: #333333;
     --brand: #000000;
     --brand-ink: #ffffff;
+    --letterhead-band: #ffffff;
+    --letterhead-band-ink: #000000;
+    --letterhead-ink: #000000;
     --rule: #999999;
     --rule-strong: #000000;
     --surface-muted: #ffffff;

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BrandMark } from "@/components/brand/brand-mark";
+
 import { SidebarNav } from "@/components/nav/sidebar-nav";
 import {
   Sidebar,
@@ -16,11 +18,8 @@ export function AppSidebar() {
   return (
     <Sidebar className="print-hidden">
       <SidebarHeader className="border-b border-rule px-4 py-3">
-        <Link
-          href="/"
-          className="font-heading text-base leading-tight font-semibold tracking-tight"
-        >
-          IELTS General Training
+        <Link href="/" className="block">
+          <BrandMark logoClassName="h-8 w-auto" />
         </Link>
       </SidebarHeader>
 

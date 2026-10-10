@@ -49,7 +49,7 @@ const units: Unit[] = listeningLab.sections.map((section) => {
 
 describe("Listening Lab", () => {
   it("has a script and at least one exercise in every section", () => {
-    expect(units).toHaveLength(4);
+    expect(units).toHaveLength(8);
     for (const unit of units) {
       expect(unit.transcript.length).toBeGreaterThan(500);
       expect(unit.exercises.length).toBeGreaterThan(0);

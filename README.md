@@ -1,6 +1,6 @@
-# IELTS General Training
+# IELTS Training
 
-An interactive course for IELTS General Training, built from the print
+An interactive course for IELTS, built from the print
 student book. It does what paper cannot: marks instantly, shows why an
 answer is wrong at the moment it is wrong, times practice, and keeps
 progress.
@@ -23,7 +23,8 @@ IELTS_BOOK="/path/to/IELTS-GT-Student-Book.docx" npm run content
 
 | Script | What it does |
 | --- | --- |
-| `npm run content` | Regenerates `content/` and the search index from the Word book |
+| `npm run content` | Regenerates `content/` from the Word book |
+| `npm run index` | Rebuilds the Cmd+K search index from the content as it stands |
 | `npm run dev` | Development server |
 | `npm run build` | Production build; fails on a schema error |
 | `npm test` | Marking-engine tests |
@@ -37,8 +38,8 @@ The Word book is the source of truth; `content/` is generated from it.
 1. In the book, head the part `Part 12: Its Title` in **Heading 1**.
 2. Add a line to the printed Contents page: `Part 12   Its Title: one line of summary`.
 3. Head each section `12.1  Its Title` in **Heading 2**.
-4. Run `npm run content`. The part, its route and its place in the sidebar,
-   the search index and the progress page all follow.
+4. Run `npm run content`, then `npm run index`. The part, its route, its
+   place in the sidebar, the search index and the progress page all follow.
 
 ## Adding a new exercise
 
@@ -50,8 +51,8 @@ The Word book is the source of truth; `content/` is generated from it.
    explanation the student is shown, and it is never invented for you.
 3. Add `"b.n": "12.1"` to `KEYED_SECTION` in `tools/docx/exercises.ts` so
    the key is matched to the section.
-4. Run `npm run content`. Anything the book does not supply is reported,
-   not filled in.
+4. Run `npm run content`, then `npm run index`. Anything the book does not
+   supply is reported, not filled in.
 
 Say "You have six minutes" in the rubric and the exercise gets a timer.
 
@@ -87,3 +88,14 @@ place where the book turned out not to have what the app needs.
   shown as text rather than as a marked exercise.
 - **Practice Test 1 has no key**, by the book's own decision — it says the
   key is held by the teacher. Its questions render as an exam paper.
+
+## The school header
+
+The letterhead on the front page — emblems, council, zone, school name —
+is `components/brand/school-header.tsx`, with the wording in `COURSE.school`
+(`lib/course.ts`) and the four emblems in `public/brand/school/`. Replace an
+emblem by overwriting its file and updating its size in the component.
+
+A logo dropped into `public/brand/` itself (`logo.png`, `.svg`, `.jpg`,
+`.webp`) appears beside the course name in the sidebar and the top bar; an
+empty folder is not an error. `public/brand/README.md` has the detail.
