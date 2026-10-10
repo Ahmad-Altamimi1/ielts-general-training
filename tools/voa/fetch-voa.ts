@@ -55,6 +55,26 @@ function textOf(html: string): string {
 }
 
 /**
+ * How far the article body runs, counted from an opening tag.
+ *
+ * The body contains nested divs — embedded players, image frames — so it
+ * cannot be closed by searching for the next `</div>`. Without this the
+ * scan runs past the article into the share buttons and the site menu,
+ * and those arrive as transcript lines.
+ */
+function closingDivAt(html: string, from: number): number {
+  const tags = /<div\b|<\/div>/g;
+  tags.lastIndex = from;
+
+  let depth = 0;
+  for (let m = tags.exec(html); m !== null; m = tags.exec(html)) {
+    depth += m[0] === "</div>" ? -1 : 1;
+    if (depth === 0) return m.index - from;
+  }
+  return html.length - from;
+}
+
+/**
  * The report itself: the paragraphs that are actually read aloud.
  *
  * The article body opens at `class="wsw"` but contains nested divs, so it
@@ -63,10 +83,15 @@ function textOf(html: string): string {
  * the page furniture that follows it.
  */
 function transcriptFrom(html: string): string[] {
-  const start = html.indexOf('class="wsw"');
+  const attribute = html.indexOf('class="wsw"');
+  if (attribute === -1) return [];
+
+  // Count from the `<div` that carries the attribute, not from the
+  // attribute itself, or the first nested div closes the scan early.
+  const start = html.lastIndexOf("<div", attribute);
   if (start === -1) return [];
 
-  let body = html.slice(start);
+  let body = html.slice(start, start + closingDivAt(html, start));
   const glossary = body.search(/Words in This Story/i);
   if (glossary !== -1) body = body.slice(0, glossary);
 
@@ -74,11 +99,19 @@ function transcriptFrom(html: string): string[] {
   // lesson. None of it is spoken on the recording.
   const FURNITURE =
     /^(Share|Print|Follow us|See comments|Embed|No media source currently available|The URL has been copied|Download the VOA|Send us an email|Now it's your turn|Be sure to download|Write to us|See the Lesson Plan|Start the Quiz|_)/i;
+  // The embedded player lists its download options as list items.
+  const DOWNLOAD_OPTION = /^\d+\s*kbps\b/i;
 
-  return [...body.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)]
-    .map((m) => textOf(m[1]))
+  // Paragraphs and list items together, in document order. VOA sets a
+  // good deal of each report as a bulleted list — the four parts of an
+  // email, the ways to practise a word — and taking only <p> silently
+  // drops it, leaving a transcript that is missing what the recording
+  // actually says.
+  return [...body.matchAll(/<(p|li)[^>]*>([\s\S]*?)<\/\1>/g)]
+    .map((m) => textOf(m[2]))
     .filter((t) => t.length > 0)
     .filter((t) => !FURNITURE.test(t))
+    .filter((t) => !DOWNLOAD_OPTION.test(t))
     .filter((t) => !/^_{3,}/.test(t));
 }
 

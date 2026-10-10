@@ -523,3 +523,47 @@ questions, because Appendix B already fixes their answers.
 student book, so rendering it matches what students already have, and the
 brief rules out gated content. The Practice Test 1 key is still absent, by
 the book's own decision.
+
+## Revision 7 — the rest of the Listening Lab
+
+Four units now, one for each shape the Listening paper uses:
+
+| Unit | Recording | Type | Paper shape |
+| --- | --- | --- | --- |
+| lab-1 | Microcredentials | note completion | Section 4 |
+| lab-2 | Writing a good email | multiple choice | Section 2 |
+| lab-3 | An office meeting | matching + completion | Section 3 |
+| lab-4 | The memory palace | sentence completion | Section 4 |
+
+38 questions, each with an explanation that names the trap.
+
+**Three bugs in the fetcher, found by reading what it produced.**
+
+1. It took only `<p>` and VOA sets much of a report as a list, so the four
+   parts of an email and the ways to practise a word were silently
+   missing. A transcript that is missing what the recording says is worse
+   than no transcript: questions get written against a hole.
+2. Adding `<li>` then pulled in the share buttons and the site menu,
+   because the body was bounded by "the next `</div>`" and the body
+   contains nested divs. Now counted properly from the opening tag.
+3. The filter for the player's own download options never matched: a `\b`
+   had been mangled into a literal backspace character. Same class of
+   fault as the one in the exercise converter earlier.
+
+**Distractors are built the way the test builds them.** Every wrong option
+in lab-2 is something the recording actually says, moved somewhere it does
+not belong — "Good Morning" for the time-of-day answer, the closing's job
+title for the signature question. A wrong option nobody would pick teaches
+nothing.
+
+**`content/extra/lab/answers.test.ts` checks the content, not the code.**
+For every written answer it confirms the recording actually says it; for
+every letter answer it confirms the student was offered that option; and
+it requires an explanation on every question. I broke question 5
+deliberately — 51 to 67 — and watched it fail before trusting it.
+
+The transcripts are reproduced in full and unedited, because they are the
+text of the recording: trimming them would leave the script and the audio
+disagreeing.
+
+**Audio is 15 MB across four files**, served as static assets.
