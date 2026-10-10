@@ -169,6 +169,29 @@ export const blockSchema = z.discriminatedUnion("kind", [
     paragraphs: z.array(paragraphSchema).min(1),
   }),
 
+  /**
+   * A listening script — what the recording says.
+   *
+   * The book keeps these in Appendix A, away from the unit, so that a
+   * student does not read ahead. The app keeps that discipline: the text
+   * is never shown until it is asked for, and it is spoken once.
+   */
+  z.object({
+    kind: z.literal("script"),
+    title: z.string().min(1),
+    /** "Recording 1", when the book names it. */
+    recording: z.string().min(1).optional(),
+    lines: z
+      .array(
+        z.object({
+          /** "Receptionist", "Tutor" — absent for a single-voice talk. */
+          speaker: z.string().min(1).optional(),
+          text: z.string().min(1),
+        }),
+      )
+      .min(1),
+  }),
+
   /** A question reasoned through in the open, before the student tries
    *  the same type unaided. */
   z.object({

@@ -75,7 +75,12 @@ place where the book turned out not to have what the app needs.
 ## Known gaps in the source book
 
 - **Appendix A is missing.** The book refers to it three times for the
-  eight listening scripts; the file contains no Appendix A.
+  eight listening scripts; the file contains no Appendix A. The app is
+  ready for it: add the appendix to the book with `A.1`…`A.8` headings in
+  **Heading 2** and run `npm run content`. Each script then appears above
+  the questions it is read for, hidden until asked for, with a player that
+  reads it aloud once. The mapping from `A.n` to its unit is
+  `SCRIPT_SECTION` in `tools/docx/scripts.ts`.
 - **Three parts have no Contents-page summary**, so they are not generated:
   How to Use This Book, the answer-key appendix, and A Final Note.
 - **Section 10.2's key has no explanations**, so its ten questions are

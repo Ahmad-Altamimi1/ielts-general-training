@@ -437,3 +437,55 @@ control and the "On this page" links were 20–28px tall. All now clear
 
 Re-audited afterwards with axe-core including the WCAG 2.2 target-size
 rule: zero violations, no page-level overflow at any width.
+
+## Revision 5 — listening
+
+You asked why there are no recordings. Three separate reasons, none of
+them an oversight:
+
+1. **The book was never designed to have any.** It says the listening
+   material is printed as scripts for the teacher to read aloud, once
+   only, at normal speed, because "getting used to hearing something once
+   is half of the listening skill".
+2. **The scripts themselves are missing.** Appendix A is referred to three
+   times and is absent from the .docx. I searched the machine: there is no
+   other copy.
+3. **Audio playback was out of scope in the brief**, explicitly, with no
+   stubs allowed.
+
+**What I did not do: write the scripts.** Appendix B already fixes what
+every recording must say — a key explains that "the speaker corrects
+herself: 300 was last year, and the trap is 2,400, the annual figure".
+Forty such details constrain the wording exactly. A script I invented
+would contradict your own answer key and teach students wrong answers.
+
+**What I built instead**, so that the appendix is the only thing missing:
+
+- A `script` block in the schema: a title, an optional recording name,
+  and lines with an optional speaker.
+- `tools/docx/scripts.ts` reads Appendix A and attaches each script to the
+  unit it is read for, using the same heading convention as Appendix B.
+  `SCRIPT_SECTION` is the one table to extend. Six tests cover it,
+  including a line with a colon that must not be mistaken for a speaker.
+- `ListeningPlayer` speaks the script with the browser's own speech
+  synthesis, at rate 1, with no scrub bar and no rewind — the book's rule
+  is the interaction design. Playing a second time is allowed but says
+  plainly that exam conditions have been left. The script stays hidden
+  behind a control, because a student who reads it first has not practised
+  listening.
+- `hooks/use-voices.ts` subscribes to `voiceschanged`. Chrome returns an
+  empty voice list on first call, so a naive player speaks its first
+  recording in the wrong voice.
+
+Proved end to end by building a throwaway copy of the .docx with an
+Appendix A in it, running the converter, and confirming the script block
+landed in section 2.3 immediately before its exercise. That copy was
+deleted and `content/` regenerated from the real book, byte-identical to
+what is committed.
+
+**Not visually verified.** The browser pane in this session cannot load
+any `_next/static` subresource from localhost — every JS and CSS chunk
+fails while `curl` serves them correctly and the deployed HTTPS site
+renders perfectly in the same pane. An environment fault, not an app one.
+The pane also reports zero speech voices, so the audio itself could not be
+heard here. The player needs one look in a real browser.

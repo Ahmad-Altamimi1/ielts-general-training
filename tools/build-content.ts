@@ -80,6 +80,10 @@ function blockText(block: Block): string[] {
       return [...block.headers, ...block.rows.flat()];
     case "passage":
       return [block.title ?? "", ...block.paragraphs.map((p) => p.text)];
+    case "script":
+      // Searchable: a teacher looking for "vertical farming" should find
+      // the script as well as the unit it belongs to.
+      return [block.title, ...block.lines.map((l) => l.text)];
     case "worked":
       return [block.question, ...block.steps];
     case "exercise":

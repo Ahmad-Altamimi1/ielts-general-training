@@ -8,6 +8,7 @@ import {
   Worked,
 } from "@/components/content/blocks";
 import { ExerciseCard } from "@/components/exercise/exercise-card";
+import { ListeningPlayer } from "@/components/exercise/listening-player";
 import type { Block } from "@/lib/content/schema";
 
 /** Renders one block. Every `Block` kind is handled; the switch is
@@ -28,6 +29,8 @@ export function BlockRenderer({ block }: { block: Block }) {
       return <Passage block={block} />;
     case "worked":
       return <Worked block={block} />;
+    case "script":
+      return <ListeningPlayer script={block} />;
     case "exercise":
       return <ExerciseCard exercise={block.exercise} />;
   }

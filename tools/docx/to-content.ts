@@ -27,6 +27,7 @@ import {
   type KeyIndex,
   type QuestionDraft,
 } from "./exercises";
+import { collectScripts, type ScriptIndex } from "./scripts";
 import type {
   Block,
   BlockOf,
@@ -333,6 +334,7 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
   const warnings: string[] = [];
   const summaries = readContents(nodes);
   const keyIndex: KeyIndex = collectAnswerKeys(nodes);
+  const scriptIndex: ScriptIndex = collectScripts(nodes);
 
   const parts: DraftPart[] = [];
   let part: DraftPart | null = null;
@@ -405,6 +407,19 @@ export function docxToParts(nodes: DocNode[]): ConvertResult {
   const closeSection = () => {
     flushQuestions();
     flushList(acc);
+
+    // The script belongs with the questions, so it goes immediately
+    // before the first exercise in the section — or at the end when the
+    // section has none.
+    if (section) {
+      const scripts = scriptIndex.get(section.id);
+      if (scripts?.length) {
+        const at = acc.blocks.findIndex((b) => b.kind === "exercise");
+        const insertAt = at === -1 ? acc.blocks.length : at;
+        acc.blocks.splice(insertAt, 0, ...scripts);
+      }
+    }
+
     if (!part) return;
     if (section) {
       section.blocks = acc.blocks;
